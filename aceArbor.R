@@ -83,12 +83,13 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 		return(t(zz))
 		
 	} else if(ctype=="continuous") {
-		
-		zz<-fastAnc(phy, y, CI=T) # can we do this with diversitree instead?
-		
-		phenogram(phy, y)
-		
-		return(zz)
+		if(aceType=="marginal") {
+			zz<-fastAnc(phy, y, CI=T) # can we do this with diversitree instead?
+			phenogram(phy, y)
+			return(zz)
+		} else {
+			stop("Not supported yet")
+		}
 		
 	} else stop("Invalid character type in aceArbor.\n")
 	
