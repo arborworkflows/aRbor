@@ -30,7 +30,7 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	# check character type
 	ctype = match.arg(charType, c("fromData", "discrete", "continuous"))
 	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ASD"))
-	aceType = match.arg(aceType, c("marginal", "joint"))
+	aceType = match.arg(aceType, c("marginal", "joint", "MCMC"))
 	
 	if(ctype=="fromData") # then try to figure it out
 	{
@@ -62,13 +62,22 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 			plot(phy, main="Marginal ASR")
 			nodelabels(pie=t(zz), piecol=1:2, cex=.5, frame="circle")
 			legend("bottomleft", fill=1:2, legend=charStates)
-		} else if(aceType=="joint") {
+		} else if(aceType=="joint") { # this should be modified to average over many reps
 			fit<-find.mle(lik, setNames(1, argnames(lik)))
 			zz<-asr.joint(lik, coef(fit))
 			
 			plot(phy, main="Joint ASR")
 			nodelabels(pch=19, col=zz, bg=zz, cex=2)
 			legend("bottomleft", fill=1:2, legend=charStates)
+		} else if(aceType=="MCMC"){
+			set.seed(1)
+			prior <- make.prior.exponential(.5) # NOT GENERAL
+			samples <- mcmc(lik, pars, 1000, w=1, prior=prior, print.every=10)
+			aceSamp <- apply(samples[c(-1, -dim(samples)[2])], 1, asr.joint, lik=lik)
+			zz<-apply(aceSamp, 1, table)/1000
+
+			plot(exTree, main="MCMC ASR")
+			nodelabels(pie=t(zz), piecol=1:2, cex=.5, frame="circle")
 		}
 		
 		return(t(zz))
