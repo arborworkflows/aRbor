@@ -55,6 +55,7 @@ x<-sim.history(tree,Q)$states
 y<-setNames(as.numeric(x),names(x))
 
 aceArbor(tree, y, charType="discrete")
+aceArbor(tree, y, charType="discrete", discreteModelType="ARD")
 
 aceArbor(tree, as.factor(y), charType="discrete")
 

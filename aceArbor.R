@@ -1,7 +1,7 @@
 library(diversitree)
 library(geiger)
 
-aceArbor<-function(phy, dat, charType="fromData", model=NULL, aceType="marginal") {
+aceArbor<-function(phy, dat, charType="fromData", model=NULL, aceType="marginal", discreteModelType="ER") {
 	
 	# this function requires a tree in ape phylo format (phy)
 	# and a single character (dat) with names names(dat) that match phy$tip.label
@@ -46,12 +46,12 @@ aceArbor<-function(phy, dat, charType="fromData", model=NULL, aceType="marginal"
 		dat<-as.factor(dat)
 		charStates<-levels(dat)
 		k<-nlevels(dat)
-		if(k != 2) stop("Only 2-state discrete characters are currently supported")
 		
 		ndat<-as.numeric(dat)
 		names(ndat)<-names(dat)
 		
-		lik<-make.mkn(phy, ndat, k=2)
+		lik<-make.mkn(phy, ndat, k=k)
+		con<-makeMkConstraints(k=k, modelType= discreteModelType)
 		lik<-constrain(lik, q12~q21)
 		
 		fit<-find.mle(lik, setNames(1, argnames(lik)))
