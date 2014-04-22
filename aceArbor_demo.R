@@ -19,18 +19,32 @@ fit<-find.mle(lik,setNames(1,argnames(lik)))
 ZZ<-t(asr.marginal(lik,coef(fit)))
 dimnames(ZZ)<-dimnames(XX$marginal.anc)
 
-ZZ<-t(asr.joint(lik,coef(fit)))
 
 fd<-fitDiscrete(tree, y)
+
+library(phangorn)
+X = phyDat(as.matrix(x), type="USER", levels=c("1", "2", "3"))
+fitph = pml(tree, X)
+# you may want to optimize the overall rate
+fitph = optim.pml(fitph, optEdge=FALSE, optRate=TRUE) 
+fitph$rate
+anc.ml = ancestral.pml(fit)
+plotAnc(tree, anc.ml, 1)
+
 
 # Compare
 XX$loglik
 fit$lnLik
 fd$opt$lnL
+fitph$logLik
 
 XX$Q
 fit$par
 fd$opt$q12
+fitph$rate
+
+plot(XX$marginal.anc[,1], ZZ[,1])
+plot(ZZ[,1],anc.ml)
 
 fd<-fitDiscrete(tree, y)
 
@@ -41,3 +55,13 @@ x<-sim.history(tree,Q)$states
 y<-setNames(as.numeric(x),names(x))
 
 aceArbor(tree, y, charType="discrete")
+
+aceArbor(tree, as.factor(y), charType="discrete")
+
+aceArbor(tree, y-1, charType="discrete")
+
+
+zz<-c("Poop", "Boobs")[y]
+names(zz)<-names(y)
+aceArbor(tree, zz, charType="discrete")
+
