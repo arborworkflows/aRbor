@@ -1,7 +1,7 @@
 library(diversitree)
 library(geiger)
 
-aceArbor<-function(phy, dat, charType="fromData", model=NULL, aceType="marginal", discreteModelType="ER") {
+aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteModelType="ER") {
 	
 	# this function requires a tree in ape phylo format (phy)
 	# and a single character (dat) with names names(dat) that match phy$tip.label
@@ -29,6 +29,8 @@ aceArbor<-function(phy, dat, charType="fromData", model=NULL, aceType="marginal"
 	
 	# check character type
 	ctype = match.arg(charType, c("fromData", "discrete", "continuous"))
+	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ASD"))
+	aceType = match.arg(aceType, c("marginal", "joint"))
 	
 	if(ctype=="fromData") # then try to figure it out
 	{
@@ -54,13 +56,20 @@ aceArbor<-function(phy, dat, charType="fromData", model=NULL, aceType="marginal"
 		con<-makeMkConstraints(k=k, modelType= discreteModelType)
 		lik<-constrain(lik, q12~q21)
 		
-		fit<-find.mle(lik, setNames(1, argnames(lik)))
-
-		zz<-asr.marginal(lik, coef(fit))
-		
-		plot(phy, main="Marginal ASR")
-		nodelabels(pie=t(zz), piecol=1:2, cex=.5, frame="circle")
-		legend("bottomleft", fill=1:2, legend=charStates)
+		if(aceType=="marginal") {
+			fit<-find.mle(lik, setNames(1, argnames(lik)))
+			zz<-asr.marginal(lik, coef(fit))
+			plot(phy, main="Marginal ASR")
+			nodelabels(pie=t(zz), piecol=1:2, cex=.5, frame="circle")
+			legend("bottomleft", fill=1:2, legend=charStates)
+		} else if(aceType=="joint") {
+			fit<-find.mle(lik, setNames(1, argnames(lik)))
+			zz<-asr.joint(lik, coef(fit))
+			
+			plot(phy, main="Joint ASR")
+			nodelabels(pch=19, col=zz, bg=zz, cex=2)
+			legend("bottomleft", fill=1:2, legend=charStates)
+		}
 		
 		return(t(zz))
 		
