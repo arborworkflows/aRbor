@@ -84,8 +84,11 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 		
 	} else if(ctype=="continuous") {
 		if(aceType=="marginal") {
-			zz<-fastAnc(phy, y, CI=T) # can we do this with diversitree instead?
+			zz<-fastAnc(phy, y, CI=T) 
 			phenogram(phy, y)
+			return(zz)
+		} else if (aceType=="MCMC") {
+			zz<-ace.Bayes(phy, y, ngen=10000)
 			return(zz)
 		} else {
 			stop("Not supported yet")
