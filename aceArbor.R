@@ -94,8 +94,3 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	} else stop("Invalid character type in aceArbor.\n")
 	
 }
-
-makeMkConstraints<-function(k, matrixModel="ER") {
-	
-	
-}
