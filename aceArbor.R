@@ -88,7 +88,7 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 			phenogram(phy, y)
 			return(zz)
 		} else if (aceType=="MCMC") {
-			zz<-ace.Bayes(phy, y, ngen=10000)
+			zz<-anc.Bayes(phy, y, ngen=10000)
 			return(zz)
 		} else {
 			stop("Not supported yet")
