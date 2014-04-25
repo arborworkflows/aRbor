@@ -113,7 +113,7 @@ plotDiscreteReconstruction<-function(phy, zz, charStates) {
 getDiscreteAceJoint<-function(phy, ndat, k, discreteModelType) {
 	lik<-make.mkn(phy, ndat, k=k)
 	con<-makeMkConstraints(k=k, modelType= discreteModelType)
-	lik<-constrain(lik, con)
+	lik<-constrain(lik, con);
 		
 	fit<-find.mle(lik, setNames(1, argnames(lik)))
 	xx<-asr.joint(lik, coef(fit))
