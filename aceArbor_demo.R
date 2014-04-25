@@ -1,4 +1,5 @@
 library(phytools)
+library(diversitree)
 
 tree<-pbtree(n=100, scale=1)
 Q<-matrix(c(-2,1,1,1,-2,1,1,1,-2),3,3)
@@ -18,6 +19,10 @@ lik<-constrain(lik,q13~q12,q21~q12,q23~q12,q31~q12,q32~q12)
 fit<-find.mle(lik,setNames(1,argnames(lik)))
 ZZ<-t(asr.marginal(lik,coef(fit)))
 dimnames(ZZ)<-dimnames(XX$marginal.anc)
+
+plot(tree, main="Marginal ASR")
+nodelabels(pie=ZZ, piecol=1:2, cex=.5, frame="circle")
+
 
 
 fd<-fitDiscrete(tree, y)

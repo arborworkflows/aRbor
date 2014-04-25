@@ -1,7 +1,7 @@
 library(diversitree)
 library(geiger)
 
-aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteModelType="ER") {
+aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteModelType="ER", plot=T) {
 	
 	# this function requires a tree in ape phylo format (phy)
 	# and a single character (dat) with names names(dat) that match phy$tip.label
@@ -45,6 +45,8 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	} # needless to say, this is not yet robust
 	
 	if(ctype=="discrete") {
+		
+		# this changes the discrete data to 1:n and remembers the original charStates
 		dat<-as.factor(dat)
 		charStates<-levels(dat)
 		k<-nlevels(dat)
@@ -52,23 +54,16 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 		ndat<-as.numeric(dat)
 		names(ndat)<-names(dat)
 		
-		lik<-make.mkn(phy, ndat, k=k)
-		con<-makeMkConstraints(k=k, modelType= discreteModelType)
-		lik<-constrain(lik, q12~q21)
-		
 		if(aceType=="marginal") {
-			fit<-find.mle(lik, setNames(1, argnames(lik)))
-			zz<-asr.marginal(lik, coef(fit))
-			plot(phy, main="Marginal ASR")
-			nodelabels(pie=t(zz), piecol=1:2, cex=.5, frame="circle")
-			legend("bottomleft", fill=1:2, legend=charStates)
+			zz<-getDiscreteAceMarginal(phy, ndat, k, discreteModelType);
+			if(plot) plotDiscreteReconstruction(phy, zz, charStates)
+			colnames(zz)<-charStates
+			return(zz)
 		} else if(aceType=="joint") { # this should be modified to average over many reps
-			fit<-find.mle(lik, setNames(1, argnames(lik)))
-			zz<-asr.joint(lik, coef(fit))
-			
-			plot(phy, main="Joint ASR")
-			nodelabels(pch=19, col=zz, bg=zz, cex=2)
-			legend("bottomleft", fill=1:2, legend=charStates)
+			zz<-getDiscreteAceJoint(phy, ndat, k, discreteModelType);
+			if(plot) plotDiscreteReconstruction(phy, zz, charStates)
+			colnames(zz)<-charStates
+			return(zz)
 		} else if(aceType=="MCMC"){
 			set.seed(1)
 			prior <- make.prior.exponential(.5) # NOT GENERAL
@@ -97,3 +92,35 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	} else stop("Invalid character type in aceArbor.\n")
 	
 }
+
+getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
+	lik<-make.mkn(phy, ndat, k=k)
+	con<-makeMkConstraints(k=k, modelType= discreteModelType)
+	lik<-constrain(lik, con)
+		
+	fit<-find.mle(lik, setNames(1, argnames(lik)))
+	zz<-t(asr.marginal(lik, coef(fit)))
+	zz		
+}
+
+plotDiscreteReconstruction<-function(phy, zz, charStates) {
+	plot(phy, main="ASR")
+	nodelabels(pie=zz, piecol=1:2, cex=.5, frame="circle")
+	legend("bottomleft", fill=1:2, legend=charStates)
+}
+
+
+getDiscreteAceJoint<-function(phy, ndat, k, discreteModelType) {
+	lik<-make.mkn(phy, ndat, k=k)
+	con<-makeMkConstraints(k=k, modelType= discreteModelType)
+	lik<-constrain(lik, con)
+		
+	fit<-find.mle(lik, setNames(1, argnames(lik)))
+	xx<-asr.joint(lik, coef(fit))
+	zz<-matrix(0, nrow=length(xx), ncol=k)
+	zz[which(xx==1),1]<-1	
+	zz[which(xx==2),2]<-1		
+	zz
+}
+
+			
