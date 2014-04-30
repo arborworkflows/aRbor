@@ -29,7 +29,7 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	
 	# check character type
 	ctype = match.arg(charType, c("fromData", "discrete", "continuous"))
-	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ASD"))
+	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
 	aceType = match.arg(aceType, c("marginal", "joint", "MCMC"))
 	
 	if(ctype=="fromData") # then try to figure it out
@@ -87,9 +87,12 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	lik<-make.mkn(phy, ndat, k=k)
 	con<-makeMkConstraints(k=k, modelType= discreteModelType)
-	lik<-constrain(lik, con)
-		
-	fit<-find.mle(lik, setNames(1, argnames(lik)))
+	if(!is.null(con))
+		lik<-constrain(lik, con)
+	
+	pnames<-argnames(lik)
+	fit<-find.mle(lik, setNames(rep(1,length(pnames)), argnames(lik)))
+	
 	zz<-t(asr.marginal(lik, coef(fit)))
 	zz		
 }
@@ -104,9 +107,12 @@ plotDiscreteReconstruction<-function(phy, zz, charStates) {
 getDiscreteAceJoint<-function(phy, ndat, k, discreteModelType) {
 	lik<-make.mkn(phy, ndat, k=k)
 	con<-makeMkConstraints(k=k, modelType= discreteModelType)
-	lik<-constrain(lik, con);
-		
-	fit<-find.mle(lik, setNames(1, argnames(lik)))
+	if(!is.null(con))
+		lik<-constrain(lik, con)
+				
+	pnames<-argnames(lik)
+	fit<-find.mle(lik, setNames(rep(1,length(pnames)), argnames(lik)))
+	
 	xx<-asr.joint(lik, coef(fit))
 	zz<-matrix(0, nrow=length(xx), ncol=k)
 	zz[which(xx==1),1]<-1	
@@ -117,8 +123,9 @@ getDiscreteAceJoint<-function(phy, ndat, k, discreteModelType) {
 getDiscreteAceMCMC<-function(phy, ndat, k, discreteModelType) { # results do not look correct to me
 	lik<-make.mkn(phy, ndat, k=k)
 	con<-makeMkConstraints(k=k, modelType= discreteModelType)
-	lik<-constrain(lik, con)
-		
+	if(!is.null(con))
+		lik<-constrain(lik, con)
+				
 	set.seed(1) # this is not general
 	prior <- make.prior.exponential(.5) # NOT GENERAL - we need arguments for this
 	pars<-exp(prior(1))

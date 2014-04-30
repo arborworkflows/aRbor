@@ -9,16 +9,17 @@ x<-sim.history(tree,Q)$states
 y<-setNames(as.numeric(x),names(x))
 
 aceArbor(tree, y, charType="discrete")
-aceArbor(tree, y, charType="discrete", discreteModelType="ARD")
+aceArbor(tree, y, charType="discrete", discreteModelType="SYM")
+aceArbor(tree, y, charType="discrete", discreteModelType="ARD") # there is an error here
 
 aceArbor(tree, as.factor(y), charType="discrete")
 
 aceArbor(tree, y-1, charType="discrete")
 
 
-zz<-c("Poop", "Boobs")[y]
+zz<-c("cat", "dog")[y]
 names(zz)<-names(y)
 aceArbor(tree, zz, charType="discrete")
 aceArbor(tree, zz, charType="discrete", aceType="joint")
-aceArbor(tree, zz, charType="discrete", aceType="MCMC")
-
+aceArbor(tree, zz, charType="discrete", aceType="MCMC") # this doesn't look right
+ 
