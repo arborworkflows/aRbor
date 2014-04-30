@@ -33,16 +33,7 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	aceType = match.arg(aceType, c("marginal", "joint", "MCMC"))
 	
 	if(ctype=="fromData") # then try to figure it out
-	{
-		if(is.factor(dat)) {
-			charType<-"discrete"
-		} else if(nlevels(as.factor(dat))/length(dat) < 0.1) {
-			warning("Guessing that this is a discrete character based on repeated values")
-			charType<-"discrete"
-		} else {
-			charType<-"continuous"
-		}
-	} # needless to say, this is not yet robust
+		ctype<-detectCharacterType(dat)
 	
 	if(ctype=="discrete") {
 		
