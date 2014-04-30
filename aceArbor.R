@@ -57,26 +57,17 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 		if(aceType=="marginal") {
 			zz<-getDiscreteAceMarginal(phy, ndat, k, discreteModelType);
 			if(plot) plotDiscreteReconstruction(phy, zz, charStates)
-			colnames(zz)<-charStates
-			return(zz)
 		} else if(aceType=="joint") { # this should be modified to average over many reps
-			zz<-getDiscreteAceJoint(phy, ndat, k, discreteModelType);
+			zz<-getDiscreteAceJoint(phy, ndat, k, discreteModelType)
 			if(plot) plotDiscreteReconstruction(phy, zz, charStates)
-			colnames(zz)<-charStates
-			return(zz)
 		} else if(aceType=="MCMC"){
-			set.seed(1)
-			prior <- make.prior.exponential(.5) # NOT GENERAL
-			samples <- mcmc(lik, pars, 1000, w=1, prior=prior, print.every=10)
-			aceSamp <- apply(samples[c(-1, -dim(samples)[2])], 1, asr.joint, lik=lik)
-			zz<-apply(aceSamp, 1, table)/1000
-
-			plot(exTree, main="MCMC ASR")
-			nodelabels(pie=t(zz), piecol=1:2, cex=.5, frame="circle")
+			zz<- getDiscreteAceMCMC(phy, ndat, k, discreteModelType)
+			if(plot) plotDiscreteReconstruction(phy, zz, charStates)
 		}
 		
-		return(t(zz))
-		
+		colnames(zz)<-charStates
+		return(zz)	
+			
 	} else if(ctype=="continuous") {
 		if(aceType=="marginal") {
 			zz<-fastAnc(phy, y, CI=T) 
@@ -122,5 +113,21 @@ getDiscreteAceJoint<-function(phy, ndat, k, discreteModelType) {
 	zz[which(xx==2),2]<-1		
 	zz
 }
+
+getDiscreteAceMCMC<-function(phy, ndat, k, discreteModelType) { # results do not look correct to me
+	lik<-make.mkn(phy, ndat, k=k)
+	con<-makeMkConstraints(k=k, modelType= discreteModelType)
+	lik<-constrain(lik, con)
+		
+	set.seed(1) # this is not general
+	prior <- make.prior.exponential(.5) # NOT GENERAL - we need arguments for this
+	pars<-exp(prior(1))
+	samples <- mcmc(lik, pars, 1000, w=1, prior=prior, print.every=10) # likewise, need control arguments here
+	aceSamp <- apply(samples[c(-1, -dim(samples)[2])], 1, asr.joint, lik=lik)
+	zz<-apply(aceSamp, 2, table)/1000
+	t(zz)
+}
+	
+
 
 			

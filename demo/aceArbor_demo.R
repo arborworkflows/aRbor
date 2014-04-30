@@ -19,4 +19,6 @@ aceArbor(tree, y-1, charType="discrete")
 zz<-c("Poop", "Boobs")[y]
 names(zz)<-names(y)
 aceArbor(tree, zz, charType="discrete")
+aceArbor(tree, zz, charType="discrete", aceType="joint")
+aceArbor(tree, zz, charType="discrete", aceType="MCMC")
 
