@@ -9,3 +9,7 @@ x<-sim.history(tree,Q)$states
 y<-setNames(as.numeric(x),names(x))
 
 physigArbor(tree, y, charType="discrete")
+physigArbor(tree, y, charType="discrete", signalTest="garbageTest")
+physigArbor(tree, y, charType="discrete", signalTest="Blomberg")
+
+
