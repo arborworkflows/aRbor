@@ -1,13 +1,14 @@
 # function for calculating phylogenetic signal of discrete and continuous traits
 # can use either Blomberg (for continuous), Pagel lambda (for both), or "garbage test" (for discrete)
 
-aceArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
+physigArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
 	ctype = match.arg(charType, c("fromData", "discrete", "continuous"))
 
 	if(ctype=="fromData") # then try to figure it out
 		ctype<-detectCharacterType(dat)
 	
-	signalTest = match.arg(aceType, c("pagelLambda", "Blomberg", "garbageTest"))
+	signalTest = match.arg(signalTest, c("pagelLambda", "Blomberg", "garbageTest"))
+	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
 
 	
 	if(ctype=="discrete") {
@@ -31,10 +32,21 @@ aceArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", disc
 	if(ctype=="continuous") {
 		
 	}
+	
+	return(res)
 
 }
 
 discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
 	m1<-fitDiscrete(phy, ndat, model=discreteModelType)
-	m2<-fitDiscrete(phy, ndat, model= discreteModelType, transform="lambda")
+	m2<-fitDiscrete(phy, ndat, model=discreteModelType, transform="lambda")
+	
+	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
+	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
+	
+	aicScores<-c(m1$opt$aicc, m2$opt$aicc)
+	names(aicScores)<-c("Mk", "Mk plus lambda")
+	
+	res<-list(chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aicScores= aicScores)
+	return(res)
 }
