@@ -30,7 +30,13 @@ physigArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", d
 	}
 	
 	if(ctype=="continuous") {
-		
+		if(signalTest=="pagelLambda") {
+			res<-continuousLambdaTest(phy, dat)
+		} else if(signalTest=="garbageTest") {
+			res<-continuousGarbageTest(phy, dat)
+		} else if(signalTest=="Blomberg") {
+			res<-continuousBlombergTest(phy, dat)
+		}
 	}
 	
 	return(res)
@@ -45,7 +51,7 @@ discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
 	
 	aicScores<-c(m1$opt$aicc, m2$opt$aicc)
-	names(aicScores)<-c("Mk", "Mk plus lambda")
+	names(aicScores)<-c("Mk", "Mk+lambda")
 	
 	res<-list(chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aicScores= aicScores)
 	return(res)
@@ -53,16 +59,16 @@ discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
 
 discreteGarbageTest<-function(phy, ndat, k, discreteModelType) {
 	m1<-fitDiscrete(phy, ndat, model=discreteModelType)
-	m2<-fitGarbageModel(phy, ndat)
+	m2<-fitDiscreteGarbageModel(phy, ndat)
 	
-	aicScores<-c(m1$opt$aicc, m2$aicc)
-	names(aicScores)<-c("Mk", "Garbage")
+	aiccScores<-c(m1$opt$aicc, m2$aicc)
+	names(aiccScores)<-c("Mk", "Garbage")
 	
-	res<-list(aicScores= aicScores)
+	res<-list(aiccScores= aiccScores)
 	return(res)
 }
 
-fitGarbageModel<-function(phy, ndat) {
+fitDiscreteGarbageModel<-function(phy, ndat) {
 	tt <- table(ndat)
 	prob <- tt/sum(tt)
 	lnL <- sum(tt * log(prob))
@@ -71,5 +77,37 @@ fitGarbageModel<-function(phy, ndat) {
 	aic <- -2 * lnL + 2 * k
 	aicc <- aic + 2 * k * (k+1) / (n - k - 1)
 	res<-list(prob=prob, lnL=lnL, k=k, aic=aic, aicc=aicc)
+	return(res)
+}
+
+
+continuousLambdaTest<-function(phy, dat) {
+	m1<-fitContinuous(phy, dat, model="BM")
+	m2<-fitContinuous(phy, dat, model="lambda")
+	
+	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
+	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
+	
+	aicScores<-c(m1$opt$aicc, m2$opt$aicc)
+	names(aicScores)<-c("BM", "BM+lambda")
+	
+	res<-list(chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aicScores= aicScores)
+	return(res)
+}
+
+
+continuousGarbageTest<-function(phy, dat) {
+	m1<-fitContinuous(phy, dat)
+	m2<-fitContinuous(phy, dat, model="white")
+	
+	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
+	names(aiccScores)<-c("Mk", "WhiteNoise")
+	
+	res<-list(aiccScores= aiccScores)
+	return(res)
+}
+
+continuousBlombergTest<-function(phy, dat) {
+	res<-phylosignal(dat, phy)
 	return(res)
 }
