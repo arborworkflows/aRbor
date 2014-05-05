@@ -28,3 +28,16 @@ makeMkConstraints<-function(k, modelType="ER") {
 	 
 	res
 }
+
+# this function is not general at all - it only works for k=2 and ER model
+makeDiscreteCorrelationConstraints<-function(modelType="ER") {
+	
+	# correlated model - both depend on one another
+	cCon<-makeMkConstraints(k=4, model="SYM")
+
+	# uncorrelated model
+	uCon<-c(cCon, "q43~q21", "q42~q31")
+	
+	return(list(uCon=uCon, cCon= cCon))
+	
+}
