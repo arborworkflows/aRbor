@@ -1,25 +1,25 @@
-discreteCorrelation<-function(phy, d1, d2) {
+discreteCorrelation<-function(phy, charA, charB, modelType="ER") {
 	
 	# check for perfect name matching
 	# this could be improved a lot
 	
-	td1<-name.check(phy,d1)
-	td2<-name.check(phy,d2)
+	td1<-name.check(phy, charA)
+	td2<-name.check(phy, charB)
 
 	if(td1 != "OK" | td2 != "OK") stop("Names don't match")
 	
 	# this changes the discrete data to 1:n and remembers the original charStates
-	dat1<-as.factor(d1)
-	charStates1<-levels(dat1)
-	k1<-nlevels(dat1)
+	datA<-as.factor(charA)
+	charStatesA<-levels(datA)
+	kA<-nlevels(datA)
 	
-	dat2<-as.factor(d2)
-	charStates2<-levels(dat2)
-	k2<-nlevels(dat2)
+	datB<-as.factor(charB)
+	charStatesB<-levels(datB)
+	kB<-nlevels(datB)
 	
-	if(k1 != 2 | k2 != 2) stop("Only 2-state characters currently supported")
-	
-	mergedDat<-combineDiscreteCharacters(dat1, dat2)
+	if(kA != 2 | kB != 2) stop("Only 2-state characters currently supported")
+		
+	mergedDat<-combineDiscreteCharacters(datA, datB)
 			
 	charStates<-levels(mergedDat)
 	k<-nlevels(mergedDat)
@@ -27,7 +27,7 @@ discreteCorrelation<-function(phy, d1, d2) {
 	ndat<-as.numeric(mergedDat)
 	names(ndat)<-names(mergedDat)
 		
-	constraint<-makeDiscreteCorrelationConstraints(modelType="ER")
+	constraint<-makeDiscreteCorrelationConstraints(modelType=modelType)
 	
 	lik<-make.mkn(phy, ndat, k=k)
 	ulik<-constrain(lik, formulae=constraint$uCon, extra=constraint$uExtra)
@@ -48,9 +48,10 @@ discreteCorrelation<-function(phy, d1, d2) {
 
 }
 
+
+
 combineDiscreteCharacters<-function(dat1, dat2) {
-	newDat<-paste(as.character(dat1), as.character(dat2), sep="")
-	newDat<-factor(newDat, levels=c("11", "12", "21", "22"))
+	newDat<-interaction(dat1, dat2, lex.order=T) # lex.order to follow notation order in Pagel
 	names(newDat)<-names(dat1)
 	return(newDat)
 }
