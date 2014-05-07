@@ -33,11 +33,21 @@ makeMkConstraints<-function(k, modelType="ER") {
 makeDiscreteCorrelationConstraints<-function(modelType="ER") {
 	
 	# correlated model - both depend on one another
-	cCon<-makeMkConstraints(k=4, model= modelType)
+	# cCon<-makeMkConstraints(k=4, model= modelType)
+	# key: 1 = 11, 2 = 12, 3 = 21, 4 = 22
+	if(modelType=="ER" | modelType == "SYM") {
+		uCon<-c("q13~qC1", "q31~qC1", "q24~qC1", "q42~qC1", 
+				"q12~qC2", "q21~qC2", "q34~qC2", "q43~qC2",
+				"q14~0", "q41~0", "q23~0", "q32~0")
+		uExtra<-c("qC1", "qC2")
+		cCon<-c("q13~qC11", "q31~qC11", "q24~qC12", "q42~qC12", 
+				"q12~qC21", "q21~qC21", "q34~qC22", "q43~qC22",
+				"q14~0", "q41~0", "q23~0", "q32~0")
+		cExtra<-c("qC11","qC12", "qC21", "qC22")
 
-	# uncorrelated model
-	uCon<-c(cCon, "q43~q21", "q42~q31")
+	}
+	# Add ARD model
 	
-	return(list(uCon=uCon, cCon= cCon))
+	return(list(uCon=uCon, uExtra=uExtra, cCon=cCon, cExtra=cExtra))
 	
 }

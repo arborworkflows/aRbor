@@ -30,14 +30,27 @@ discreteCorrelation<-function(phy, d1, d2) {
 	constraint<-makeDiscreteCorrelationConstraints(modelType="ER")
 	
 	lik<-make.mkn(phy, ndat, k=k)
-	ulik<-constrain(lik, formulae=constraint$uCon)
-	clik<-constrain(lik, formulae=constraint$cCon)
+	ulik<-constrain(lik, formulae=constraint$uCon, extra=constraint$uExtra)
+	clik<-constrain(lik, formulae=constraint$cCon, extra=constraint$cExtra)
+	
+	unames<-argnames(ulik)
+	uML<-find.mle(ulik, setNames(rep(1,length(unames)), argnames(ulik)))
+	
+	cnames<-argnames(clik)
+	cML<-find.mle(clik, setNames(rep(1,length(cnames)), argnames(clik)))
+	
+	lrStat<-2*(cML$lnLik - uML$lnLik)
+	lrDF <- 2*(length(cnames)-length(unames))
+	
+	lrPVal <- pchisq(lrStat, lrDF, lower.tail=F)
+	
+	return(list(unames=unames, cnames=cnames, lrStat= lrStat, lrDF= lrDF, lrPVal= lrPVal))
 
 }
 
 combineDiscreteCharacters<-function(dat1, dat2) {
 	newDat<-paste(as.character(dat1), as.character(dat2), sep="")
-	newDat<-as.factor(newDat)
+	newDat<-factor(newDat, levels=c("11", "12", "21", "22"))
 	names(newDat)<-names(dat1)
 	return(newDat)
 }

@@ -10,3 +10,5 @@ d1<-setNames(as.numeric(x),names(x))
 
 x<-sim.history(tree,Q)$states
 d2<-setNames(as.numeric(x),names(x))
+
+discreteCorrelation(tree, d1, d2)
