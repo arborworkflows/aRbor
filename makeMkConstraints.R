@@ -43,7 +43,7 @@ makeDiscreteCorrelationConstraints<-function(modelType="ER") {
 				"q14~0", "q41~0", "q23~0", "q32~0")
 		cExtra<-c("qA_B1","qA_B2", "qB_A1", "qB_A2")
 
-	} else if(modeltype=="ARD") {
+	} else if(modelType=="ARD") {
 		uCon<-c("q13~qA12", "q31~qA21", "q24~qA12", "q42~qA21", 
 				"q12~qB12", "q21~qB21", "q34~qB12", "q43~qB21",
 				"q14~0", "q41~0", "q23~0", "q32~0")
