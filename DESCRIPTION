@@ -8,6 +8,8 @@ Maintainer: Josef Uyeda <josef.uyeda@gmail.com>
 Description: 
 License: GPL-2 | GPL-3
 Depends:
-	ape,
-	geiger,
-	picante
+    ape,
+    geiger,
+    picante,
+    diversitree,
+    dplyr
