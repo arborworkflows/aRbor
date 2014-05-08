@@ -1,11 +1,13 @@
 library(diversitree)
 library(geiger)
+library(dplyr)
 
-aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteModelType="ER", plot=T) {
+aceArbor<-function(td, colID, charType="fromData", aceType="marginal", discreteModelType="ER", plot=T) {
 	
-	# this function requires a tree in ape phylo format (phy)
-	# and a single character (dat) with names names(dat) that match phy$tip.label
-	
+	# this function requires a treedata object
+  # (see make.treedata)
+	# and a colID that tells which column to use
+  
 	# optional arguments:
 	# charType allows the user to force the data to be treated as continuous or discrete.
 	# otherwise, factors are treated as discrete and anything else is treated as continuous
@@ -15,17 +17,8 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	# e.g. OU for continuous, or sym/ard for discrete
 	# this is not yet implemented
 	
-	# Check that data is a vector
-	
-	# unlike some functions in geiger, I think we should assume that we have a single character
-	# and not a matrix of characters. So I will put in a check. Selecing columns should happen 
-	# upstream of this function
-	if(!is.null(dim(dat))) stop("This function, aceArbor, requires a vector not a matrix, as input.")
-	
-	# use treedata to make sure tree and data match
-	td<-treedata(phy,dat)
-	phy = td$phy
-    dat = td$data[,1]
+  # obtain the column that you want
+  td<-select(td, colID)
 	
 	# check character type
 	ctype = match.arg(charType, c("fromData", "discrete", "continuous"))
@@ -33,12 +26,13 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 	aceType = match.arg(aceType, c("marginal", "joint", "MCMC"))
 	
 	if(ctype=="fromData") # then try to figure it out
-		ctype<-detectCharacterType(dat)
+		ctype<-detectCharacterType(td$dat)
 	
 	if(ctype=="discrete") {
 		
 		# this changes the discrete data to 1:n and remembers the original charStates
-		dat<-as.factor(dat)
+		dat<-as.factor(td$dat[,1])
+    names(dat)<-rownames(td$dat)
 		charStates<-levels(dat)
 		k<-nlevels(dat)
 		
@@ -46,25 +40,25 @@ aceArbor<-function(phy, dat, charType="fromData", aceType="marginal", discreteMo
 		names(ndat)<-names(dat)
 		
 		if(aceType=="marginal") {
-			zz<- getDiscreteAceMarginal(phy, ndat, k, discreteModelType);
+			zz<- getDiscreteAceMarginal(td$phy, ndat, k, discreteModelType);
 		} else if(aceType=="joint") { # this should be modified to average over many reps
-			zz<- getDiscreteAceJoint(phy, ndat, k, discreteModelType)
+			zz<- getDiscreteAceJoint(td$phy, ndat, k, discreteModelType)
 		} else if(aceType=="MCMC"){
-			zz<- getDiscreteAceMCMC(phy, ndat, k, discreteModelType)
+			zz<- getDiscreteAceMCMC(td$phy, ndat, k, discreteModelType)
 		}
 		
-		if(plot) plotDiscreteReconstruction(phy, zz, dat, charStates)
+		if(plot) plotDiscreteReconstruction(td$phy, zz, dat, charStates)
     
 		colnames(zz)<-charStates
 		return(zz)	
 			
 	} else if(ctype=="continuous") {
 		if(aceType=="marginal") {
-			zz<-fastAnc(phy, y, CI=T) 
-			phenogram(phy, y)
+			zz<-fastAnc(td$phy, td$dat, CI=T) 
+			phenogram(td$phy, td$dat)
 			return(zz)
 		} else if (aceType=="MCMC") {
-			zz<-anc.Bayes(phy, y, ngen=10000)
+			zz<-anc.Bayes(td$phy, td$dat, ngen=10000)
 			return(zz)
 		} else {
 			stop("Not supported yet")

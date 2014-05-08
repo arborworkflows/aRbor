@@ -8,18 +8,25 @@ rownames(Q)<-colnames(Q)<-1:2
 x<-sim.history(tree,Q)$states
 y<-setNames(as.numeric(x),names(x))
 
-aceArbor(tree, y, charType="discrete")
-aceArbor(tree, y, charType="discrete", discreteModelType="SYM")
-aceArbor(tree, y, charType="discrete", discreteModelType="ARD") # there is an error here
+ydf <- as.data.frame(y)
+ytd<-make.treedata(tree, ydf)
 
-aceArbor(tree, as.factor(y), charType="discrete")
+select(ytd, y)
+aceArbor(ytd, colID=2, charType="discrete")
+aceArbor(ytd, colID=2, charType="discrete", discreteModelType="SYM")
+aceArbor(ytd, charType="discrete", discreteModelType="ARD") # there is an error here
 
-aceArbor(tree, y-1, charType="discrete")
+#aceArbor(tree, as.factor(y), charType="discrete")
+
+#aceArbor(tree, y-1, charType="discrete")
 
 
-zz<-c("cat", "dog")[y]
-names(zz)<-names(y)
-aceArbor(tree, zz, charType="discrete")
-aceArbor(tree, zz, charType="discrete", aceType="joint")
-aceArbor(tree, zz, charType="discrete", aceType="MCMC") # this doesn't look right
+pets<-c("cat", "dog")[y]
+names(pets)<-names(y)
+petdf<-as.data.frame(pets)
+pettd<-make.treedata(tree, petdf)
+
+aceArbor(pettd, charType="discrete")
+aceArbor(pettd, charType="discrete", aceType="joint")
+aceArbor(pettd, charType="discrete", aceType="MCMC") # this doesn't look right
  
