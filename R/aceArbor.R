@@ -1,11 +1,29 @@
-library(diversitree)
-library(geiger)
-library(dplyr)
+#' Reconstructing ancestral states of discrete and continuous characters
+#'
+#' This function returns ancestral state estimates using a variety of methods
+#'
+#' @param td An object of class 'treedata'
+#' @param colID A column selector for the dataframe in td
+#' @param charType specifies the type of character, either:
+#' \describe{
+#' 		\item{"discrete"}{a character with a discrete number of states}
+#' 		\item{"continuous"}{a continuously varying character}	
+#' 		\item{"fromData"}{will attempt to determine the data type from the data itself; DO NOT USE YET!}
+#'	}
+#' @param aceType specifies the method used to reconstruct ancestral character states:
+#' \describe{
+#' 		\item{"marginal"}{marginal ancestral state reconstructions, which reconstruct each node integrating over all possibilities at all other nodes in the tree; this is typically the method used in the literature to reconstruce ACEs}
+#' 		\item{"joint"}{joint ancestral reconstructions, which give the configuration of ancestral states that together maximize the likelihood of the data given model parameters}	
+#' 		\item{"mcmc"}{reconstruct ancestral states using Bayesian MCMC. Note that the discrete version of this doesn't seem to work, and even if it did work it is not a full MCMC ancestral state method}
+#'	}	
+#' @param discreteModelType One of ER, SYM, or ARD; see geiger's fitDiscrete for full description
+#' @param plot If true, make a plot of ancestral states.
+	
 
 aceArbor<-function(td, colID, charType="fromData", aceType="marginal", discreteModelType="ER", plot=T) {
 	
 	# this function requires a treedata object
-  # (see make.treedata)
+ 	# (see make.treedata)
 	# and a colID that tells which column to use
   
 	# optional arguments:

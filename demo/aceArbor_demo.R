@@ -1,6 +1,10 @@
 library(phytools)
 library(diversitree)
-
+library(dplyr)
+setwd("~/Documents/arbor/aRbor/R")
+source("aceArbor.R")
+source("makeMkConstraints.R")
+source("treeplyr.R")
 
 tree<-pbtree(n=100, scale=1)
 Q<-matrix(c(-1,1,1,-1),2,2)
@@ -11,9 +15,9 @@ y<-setNames(as.numeric(x),names(x))
 ydf <- as.data.frame(y)
 ytd<-make.treedata(tree, ydf)
 
-select(ytd, y)
-aceArbor(ytd, colID=2, charType="discrete")
-aceArbor(ytd, colID=2, charType="discrete", discreteModelType="SYM")
+aceArbor(td=ytd, colID=2, charType="discrete")
+
+aceArbor(td=ytd, colID=2, charType="discrete", discreteModelType="SYM")
 aceArbor(ytd, charType="discrete", discreteModelType="ARD") # there is an error here
 
 #aceArbor(tree, as.factor(y), charType="discrete")
