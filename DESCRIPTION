@@ -10,13 +10,7 @@ License: GPL-2 | GPL-3
 Depends:
     ape,
     geiger,
+    picante,
+    diversitree,
     dplyr
-Collate:
-    'aceArbor.R'
-    'detectCharacterType.R'
-    'discreteCorrelation.R'
-    'makeMkConstraints.R'
-    'phyloRegression.R'
-    'physigArbor.R'
-    'randomlyAddTaxa.R'
-    'treeplyr.R'
+
