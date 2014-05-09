@@ -11,6 +11,7 @@
 #' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
 #' @export
 make.treedata <- function(tree, data, name_column=0) {
+  if(class(tree)!="phylo") stop("tree must be of class 'phylo'")
   coln <- colnames(data)
   if(name_column==0){
       dat.label <- rownames(data)
@@ -103,6 +104,22 @@ treeply <- function(tdObject, ...){
   UseMethod("treeply")
 }
 
+#' Run a function on the phylogeny of a 'treedata' object
+#' @description Applies a function to the phylogeny in a 'treedata' object. If the order of tips are changed, or if tips are dropped, then the data are automatically reordered to match the tree.
+#' @param tdObject An object of class 'treedata'
+#' @param FUN A function that operates on an object of class 'phylo'
+#' 
+#' @return An object of class 'treedata'
+#' 
+#' @examples
+#' data(anolis)
+#' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+#' td_OU <- treeply(td, rescale, model="OU", 10)
+#'   
+#' par(mfrow=c(1,2))
+#' plot(td$phy)
+#' plot(td_OU$phy)
+#' 
 #' @export
 treeply.treedata <- function(tdObject, FUN, ...){
   if(!class(tdObject)[1]=="treedata") stop("Object is not of class 'treedata'")
