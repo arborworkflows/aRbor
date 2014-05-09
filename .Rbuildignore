@@ -1,2 +1,6 @@
 ^.*\.Rproj$
-^\.Rproj\.user$
+^\.Rproj\.user$
+^TestDocumentandLoad\.R
+^\.gitignore
+^\.Rbuildignore
+^\.Rhistory

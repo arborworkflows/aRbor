@@ -1,0 +1,33 @@
+\name{treedply.treedata}
+\alias{treedply.treedata}
+\title{Run a function on a 'treedata' object}
+\usage{
+  treedply.treedata(tdObject, ...)
+}
+\arguments{
+  \item{tdObject}{A treedata object}
+
+  \item{...}{A function call.}
+}
+\value{
+  Function output
+}
+\description{
+  Run a function on a 'treedata' object
+}
+\details{
+  This function allows arbitrary R functions that use trees
+  and data to be run on a 'treedata' objects.
+}
+\examples{
+data(anolis)
+td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+treedply(td, fitContinuous(phy, getVector(dat, SVL), model="BM"))
+treedply(td, fitContinuous(phy, select(dat, PCI_limbs, PCII_head,
+               PCIII_padwidth_vs_tail, PCIV_lamella_num), model="BM"))
+
+require(phytools)
+treedply(td, phylosig(phy, getVector(dat, awesomeness), "lambda", test=TRUE))
+treedply(td, phenogram(phy, getVector(dat, SVL), ftype="off"))
+}
+

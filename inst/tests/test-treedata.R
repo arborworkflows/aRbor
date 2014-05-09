@@ -1,0 +1,17 @@
+context("treedata works")
+test_that("treedata can handle matrix/dataframe input", {
+  require(testthat)
+  td1 <- make.treedata(anolis$phy, as.matrix(anolis$dat), name_column=1)
+  td2 <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+  jacknife <- sample(1:nrow(anolis$dat), 50, replace=FALSE)
+  td3 <- make.treedata(anolis$phy, anolis$dat[jacknife,], name_column=1)
+  td4 <- make.treedata(anolis$phy, as.matrix(anolis$dat[jacknife,]), name_column=1)
+  
+  ##Tests
+  expect_equal(td1$dat$SVL, td2$dat$SVL,  tolerance=0.000001)
+  expect_equal(td1$dat$island, td2$dat$island)
+  expect_equal(td3$dat$SVL, td4$dat$SVL,  tolerance=0.000001)
+  expect_equal(td3$phy$tip.label, rownames(td3$data))
+  expect_equal(td4$phy$tip.label, rownames(td4$data))
+  
+})
