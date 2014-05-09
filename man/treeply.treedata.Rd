@@ -1,7 +1,10 @@
-\name{treeply.treedata}
+\name{treeply}
+\alias{treeply}
 \alias{treeply.treedata}
 \title{Run a function on the phylogeny of a 'treedata' object}
 \usage{
+  treeply(tdObject, ...)
+
   treeply.treedata(tdObject, FUN, ...)
 }
 \arguments{
@@ -23,6 +26,7 @@
 data(anolis)
 td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
 td_OU <- treeply(td, rescale, model="OU", 10)
+
 par(mfrow=c(1,2))
 plot(td$phy)
 plot(td_OU$phy)

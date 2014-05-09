@@ -1,7 +1,10 @@
-\name{treedply.treedata}
+\name{treedply}
+\alias{treedply}
 \alias{treedply.treedata}
 \title{Run a function on a 'treedata' object}
 \usage{
+  treedply(tdObject, ...)
+
   treedply.treedata(tdObject, ...)
 }
 \arguments{

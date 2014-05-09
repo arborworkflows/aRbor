@@ -99,6 +99,7 @@ reorder.treedata <- function(tdObject, order="postorder", index.only=FALSE, ...)
   }
 }
 
+#' @rdname treeply.treedata
 #' @export
 treeply <- function(tdObject, ...){
   UseMethod("treeply")
@@ -136,6 +137,7 @@ treeply.treedata <- function(tdObject, FUN, ...){
   } 
 }
 
+#' @rdname treedply.treedata
 #' @export
 treedply <- function(tdObject, ...){
   UseMethod("treedply")
