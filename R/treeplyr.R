@@ -21,14 +21,14 @@ make.treedata <- function(tree, data, name_column=0) {
   #dat <- apply(dat, 2, type.convert)
   if(name_column==0){
     clnm <- colnames(dat)
-    dat <- dat[,cln]
+    dat <- dat[,clnm, drop=FALSE]
   } else {
     if(is.numeric(name_column)){
       clnm <- (1:ncol(data))[-name_column]
     } else {
       clnm <- colnames(dat)[-which(colnames(dat)==name_column)]
     }
-    dat <- dat[, clnm]
+    dat <- dat[, clnm, drop=FALSE]
     dat.label <- as.character(data[,name_column])
   }
   data_not_tree <- setdiff(dat.label, tree$tip.label)
@@ -46,6 +46,11 @@ make.treedata <- function(tree, data, name_column=0) {
 
 #' @export
 mutate.treedata <- function(tdObject, ...){
+  if(!is.call(substitute(...))){
+    call <- list(...)[[1]]
+  } else {
+    call <- substitute(...)
+  }
   dat <- mutate(tdObject$data, ...)
   tdObject$data <- dat
   rownames(tdObject$data) <- attributes(tdObject)$tip.label
@@ -64,6 +69,11 @@ select.treedata <- function(tdObject, ...){
 
 #' @export
 filter.treedata <- function(tdObject, ...){
+  if(!is.call(substitute(...))){
+    call <- list(...)[[1]]
+  } else {
+    call <- substitute(...)
+  }
   tdObject$data <- mutate(tdObject$data, tip.label=attributes(tdObject)$tip.label)
   tdObject$data <- filter(tdObject$data, ...)
   attributes(tdObject)$tip.label <- tdObject$data$tip.label
@@ -75,12 +85,22 @@ filter.treedata <- function(tdObject, ...){
 
 #' @export
 summarize.treedata <- function(tdObject, ...){
+  if(!is.call(substitute(...))){
+    call <- list(...)[[1]]
+  } else {
+    call <- substitute(...)
+  }
   res <- summarize(tdObject$data, ...)
   return(res)
 }
 
 #' @export
 summarise.treedata <- function(tdObject, ...){
+  if(!is.call(substitute(...))){
+    call <- list(...)[[1]]
+  } else {
+    call <- substitute(...)
+  }
   res <- summarise(tdObject$data, ...)
   return(res)
 }
@@ -123,6 +143,11 @@ treeply <- function(tdObject, ...){
 #' 
 #' @export
 treeply.treedata <- function(tdObject, FUN, ...){
+  if(!is.call(substitute(...))){
+    call <- list(...)[[1]]
+  } else {
+    call <- substitute(...)
+  }
   if(!class(tdObject)[1]=="treedata") stop("Object is not of class 'treedata'")
   FUN <- match.fun(FUN)
   out_FUN <- FUN(tdObject$phy, ...)
@@ -164,7 +189,11 @@ treedply <- function(tdObject, ...){
 #' treedply(td, phenogram(phy, getVector(dat, SVL), ftype="off"))
 #' @export
 treedply.treedata <- function(tdObject, ...){
-  call <- substitute(...)
+  if(!is.call(substitute(...))){
+    call <- list(...)[[1]]
+  } else {
+    call <- substitute(...)
+  }
   env <- new.env(parent = parent.frame(), size = 1L)
   env$phy <- tdObject$phy
   env$dat <- tdObject$data
