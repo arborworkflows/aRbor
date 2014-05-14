@@ -226,3 +226,12 @@ print.treedata <- function(tdObject, ...){
   print(tdObject$dat)
 }
 
+checkNumeric <- function(tdObject) {
+	dataClasses<-lapply(tdObject$data, class)
+	return(all(dataClasses=="numeric"))
+}
+
+checkFactor <- function(tdObject) {
+	dataClasses<-lapply(tdObject$data, class)
+	return(all(dataClasses=="factor"))
+}
