@@ -57,7 +57,7 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 		}
 		return(res)
 		
-	} else if(charType=="discrete" & acetype="marginal"){
+	} else if(charType=="discrete" & acetype=="marginal"){
 		
 		
 	} else return(res)
