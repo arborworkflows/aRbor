@@ -12,4 +12,5 @@ Depends:
     geiger,
     picante,
     diversitree,
+    phytools,
     dplyr
