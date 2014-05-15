@@ -36,7 +36,7 @@
 #'
 #' @references Eliot Miller unpublished
 #'
-#' @examples
+#' @examples x<-1
 
 randomlyAddTaxa <- function(tree, realGroupings, possGroupings, noRandomTrees, saveToFile=FALSE)
 {
