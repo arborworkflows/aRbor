@@ -14,8 +14,8 @@ make.treedata <- function(tree, data, name_column=0) {
   if(class(tree)!="phylo") stop("tree must be of class 'phylo'")
   coln <- colnames(data)
   if(name_column==0){
-      dat.label <- rownames(data)
-    } 
+    dat.label <- rownames(data)
+  } 
   dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(as.character(data[,x])))))
   colnames(dat) <- coln
   #dat <- apply(dat, 2, type.convert)
@@ -46,12 +46,8 @@ make.treedata <- function(tree, data, name_column=0) {
 
 #' @export
 mutate.treedata <- function(tdObject, ...){
-  if(!is.call(substitute(...))){
-    call <- list(...)[[1]]
-  } else {
-    call <- substitute(...)
-  }
-  dat <- mutate(tdObject$data, ...)
+  if(is.null(list(substitute(...))[[1]])) stop("No expressions provided to add to the treedata object")
+  dat <- dplyr:::mutate_impl(tdObject$data, dplyr:::named_dots(...), environment())
   tdObject$data <- dat
   rownames(tdObject$data) <- attributes(tdObject)$tip.label
   return(tdObject)
@@ -59,7 +55,9 @@ mutate.treedata <- function(tdObject, ...){
 
 #' @export
 select.treedata <- function(tdObject, ...){
-  dat <- select(tdObject$data, ...)
+  if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for selection")
+  vars <- select_vars(names(tdObject$data), ..., env = parent.frame())
+  dat <- dplyr:::select_impl(tdObject$data, vars)
   #dat <- lapply(dat, function(x){names(x) <- tdObject$data[,1]; x})
   tdObject$data <- dat
   rownames(tdObject$data) <- attributes(tdObject)$tip.label
@@ -67,13 +65,11 @@ select.treedata <- function(tdObject, ...){
 }
 
 
+
+
 #' @export
 filter.treedata <- function(tdObject, ...){
-  if(!is.call(substitute(...))){
-    call <- list(...)[[1]]
-  } else {
-    call <- substitute(...)
-  }
+  if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for filtering")
   tdObject$data <- mutate(tdObject$data, tip.label=attributes(tdObject)$tip.label)
   tdObject$data <- filter(tdObject$data, ...)
   attributes(tdObject)$tip.label <- tdObject$data$tip.label
@@ -85,22 +81,14 @@ filter.treedata <- function(tdObject, ...){
 
 #' @export
 summarize.treedata <- function(tdObject, ...){
-  if(!is.call(substitute(...))){
-    call <- list(...)[[1]]
-  } else {
-    call <- substitute(...)
-  }
+  if(is.null(list(substitute(...))[[1]]))  stop("No expression provided to summarize data")
   res <- summarize(tdObject$data, ...)
   return(res)
 }
 
 #' @export
 summarise.treedata <- function(tdObject, ...){
-  if(!is.call(substitute(...))){
-    call <- list(...)[[1]]
-  } else {
-    call <- substitute(...)
-  }
+  if(is.null(list(substitute(...))[[1]])) stop("No expression provided to summarize data")
   res <- summarise(tdObject$data, ...)
   return(res)
 }
@@ -143,11 +131,6 @@ treeply <- function(tdObject, ...){
 #' 
 #' @export
 treeply.treedata <- function(tdObject, FUN, ...){
-  if(!is.call(substitute(...))){
-    call <- list(...)[[1]]
-  } else {
-    call <- substitute(...)
-  }
   if(!class(tdObject)[1]=="treedata") stop("Object is not of class 'treedata'")
   FUN <- match.fun(FUN)
   out_FUN <- FUN(tdObject$phy, ...)
@@ -209,6 +192,8 @@ treedply.treedata <- function(tdObject, ...){
 #' @export
 getVector <- function(dat, ...){
   args <- as.character(substitute(list(...)))[-1L]
+  arg_sub <- type.convert(args)
+  if(is.numeric(arg_sub) | is.integer(arg_sub)) args <- arg_sub
   vecs <- lapply(args,function(x) dat[[x]])
   vecs <- lapply(vecs, function(x) setNames(x, rownames(dat)))
   if(length(vecs)==1){

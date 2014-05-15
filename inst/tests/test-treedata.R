@@ -1,6 +1,7 @@
 context("treedata works")
 test_that("treedata can handle matrix/dataframe input", {
   require(testthat)
+  data(anolis)
   td1 <- make.treedata(anolis$phy, as.matrix(anolis$dat), name_column=1)
   td2 <- make.treedata(anolis$phy, anolis$dat, name_column=1)
   jacknife <- sample(1:nrow(anolis$dat), 50, replace=FALSE)

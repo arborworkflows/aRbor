@@ -25,5 +25,6 @@ test_that("treedata can handle matrix/dataframe input", {
   expect_identical(td_filtered$phy$tip.label, rownames(td_filtered$dat))
   ##Make sure that treeply applies the function correctly
   expect_identical(td_treeply$phy$edge.length, rescale(td$phy, "OU", 10)$edge.length)  
+
   
 })
