@@ -19,9 +19,15 @@
 #' @param discreteModelType One of ER, SYM, or ARD; see geiger's fitDiscrete for full description
 #' @param plot If true, make a plot of ancestral states.
 
-aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER", plot=T) {
+aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER") {
 	
-	# need checks here that the data actually make sense
+	# check character type
+	ctype = match.arg(charType, c("discrete", "continuous"))
+	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
+	aceType = match.arg(aceType, c("marginal", "joint", "MCMC"))
+	
+	
+	# check that the data actually make sense - this is a pretty weak test
 	if(charType=="continuous") {
 		if(!checkNumeric(td)) stop("Data contains factors, which cannot be used for continuous ancestral state reconstruction")
 	}
@@ -29,42 +35,16 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 		if(!checkFactor(td)) warning("Data contains numeric entries, which will be converted to factors for discrete ancestral state reconstruction")
 	}
 	
+	#JOSEF: can you figure out a way to NOT have to send names separately?
+	res<-lapply(td$dat, function(x) aceArborCalculator(td$phy, x, charType, aceType, discreteModelType, names=rownames(td$dat)))
 	
-	res<-lapply(td$dat, function(x) aceArborCalculator(td$phy, x, charType, aceType, discreteModelType, plot))
-	
-	# the following works for charType = continuous and acetype = marginal
-	if(charType=="continuous") {
-		ancestralStates<-matrix(nrow=dim(td$dat)[1]-1, ncol=dim(td$dat)[2])
-		rownames(ancestralStates)<-names(res[[1]]$ace)
-		colnames(ancestralStates)<-colnames(td$dat)
-	
-		ancestralStatesUpperCI<-ancestralStates
-		ancestralStatesLowerCI<-ancestralStates
+	# Note discrete "joint" and "MCMC" return weird stuff and don't work
+	return(res)
 		
-		if(aceType=="MCMC") bayesOutput<-list()
-
-		for(i in 1:length(res)) {
-			ancestralStates[,i]<-res[[i]]$ace
-			ancestralStatesUpperCI[,i]<-res[[i]]$CI95[,1]
-			ancestralStatesLowerCI[,i]<-res[[i]]$CI95[,2]
-			if(aceType=="MCMC") bayesOutput[[i]]<-res[[i]]$bayesOutput
-		}
-	
-		if(aceType=="MCMC") {
-			res<-list(ancestralStates= ancestralStates, ancestralStatesUpperCI= ancestralStatesUpperCI, ancestralStatesLowerCI= ancestralStatesLowerCI, bayesOutput=bayesOutput)
-		} else {
-			res<-list(ancestralStates= ancestralStates, ancestralStatesUpperCI= ancestralStatesUpperCI, ancestralStatesLowerCI= ancestralStatesLowerCI)
-		}
-		return(res)
-		
-	} else if(charType=="discrete" && acetype=="marginal"){
-		
-		
-	} else return(res)
 		
 }	
 
-aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal", discreteModelType="ER", plot=T, mcmcGen=10000, mcmcBurnin=1000) {
+aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal", discreteModelType="ER", mcmcGen=10000, mcmcBurnin=1000, names=NULL) {
 	
 	# this function requires a phylo object
  	# and a dat
@@ -93,6 +73,8 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 		
 		ndat<-as.numeric(fdat)
 		
+		if(!is.null(names)) names(ndat)<-names
+		
 		if(aceType=="marginal") {
 			zz<- getDiscreteAceMarginal(phy, ndat, k, discreteModelType);
 		} else if(aceType=="joint") { # this should be modified to average over many reps
@@ -101,7 +83,7 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 			zz<- getDiscreteAceMCMC(phy, ndat, k, discreteModelType)
 		}
 		
-		if(plot) plotDiscreteReconstruction(phy, zz, dat, charStates)
+		#if(plot) plotDiscreteReconstruction(phy, zz, dat, charStates)
     
 		colnames(zz)<-charStates
 		return(zz)	
@@ -109,16 +91,20 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 	} else if(ctype=="continuous") {
 		if(aceType=="marginal") {
 			zz<-fastAnc(phy, dat, CI=T)
+			ancestralStates<-cbind(zz$CI95[,1], zz$ace, zz$CI95[,2])
+			rownames(ancestralStates)<-names(zz$ace)
 			names(dat)<-phy$tip.label 
-			phenogram(phy, dat)
-			return(zz)
+			#phenogram(phy, dat)
+			return(list(ancestralStates= ancestralStates))
 		} else if (aceType=="MCMC") {
 			names(dat)<-phy$tip.label 
 			bayesOutput<-anc.Bayes(phy, dat, ngen= mcmcGen)
 			bayesChar<-bayesOutput[,-which(colnames(bayesOutput) %in% c("gen", "sig2", "logLik"))]
 			aceStates<-apply(bayesChar, 2, mean)
 			CI95 <-t(apply(bayesChar, 2, function(x) quantile(x, c(0.025, 0.975))))
-			zz<-list(ace=aceStates, CI95= CI95, bayesOutput=bayesOutput)
+			ancestralStates<-cbind(CI95[,1], aceStates, CI95[,2])
+			rownames(ancestralStates)<-names(aceStates)
+			zz<-list(ancestralStates= ancestralStates, bayesOutput=bayesOutput)
 			return(zz)
 		} else {
 			stop("Not supported yet")

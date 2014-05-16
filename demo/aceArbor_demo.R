@@ -15,7 +15,7 @@ y<-setNames(as.numeric(x),names(x))
 ydf <- as.data.frame(y)
 ytd<-make.treedata(tree, ydf)
 
-aceArbor(td=ytd, colID=2, charType="discrete")
+aceArbor(td=ytd, charType="discrete")
 
 aceArbor(td=ytd, colID=2, charType="discrete", discreteModelType="SYM")
 aceArbor(ytd, charType="discrete", discreteModelType="ARD") # there is an error here
@@ -34,3 +34,13 @@ aceArbor(pettd, charType="discrete")
 aceArbor(pettd, charType="discrete", aceType="joint")
 aceArbor(pettd, charType="discrete", aceType="MCMC") # this doesn't look right
  
+
+
+tree<-pbtree(n=50)
+x<-fastBM(tree) # simulate using fastBM
+td<-make.treedata(tree, x)
+
+x<-as.data.frame(x)
+td<-make.treedata(tree, x)
+
+aceArbor(td)
