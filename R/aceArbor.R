@@ -42,7 +42,7 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 	
 }	
 
-aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal", discreteModelType="ER", mcmcGen=10000, mcmcBurnin=1000) {
+aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal", discreteModelType="ER", mcmcGen=10000, mcmcBurnin=1000, names=NULL) {
 	
 	# this function requires a phylo object
  	# and a dat
