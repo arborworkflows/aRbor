@@ -2,8 +2,16 @@ context("aceArbor works")
 test_that("aceArbor marginal ancestral state reconstruction works", {
 	require(testthat)
 	data(anolis)
+	anolis$dat$binary <- c(1,0)
+	anolis$dat$char <- c("poop", "boobs")
 	td<-make.treedata(anolis$phy, anolis$dat, name_column=1)
-	aaRes<-aceArbor(td, charType="continuous")
+  tdDiscrete <- checkFactor(td)
+  tdContinuous <- checkNumeric(td)
+  ##Make sure checkNumeric and checkFactor properly convert the data:
+  expect_true(all(sapply(tdDiscrete$dat, is.factor)))
+	expect_true(all(sapply(tdContinuous$dat, is.numeric)))
+  
+  aaRes<-aceArbor(td, charType="continuous")
 	
 	# since aceArbor uses fastAnc from phytools, we can compare to ape
 	dd<-getVector(td$dat, 1)

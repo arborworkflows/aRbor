@@ -216,12 +216,12 @@ print.treedata <- function(tdObject, ...){
 }
 
 checkNumeric <- function(tdObject, return.numeric=TRUE) {
-  valid <- which(sapply(tdObject$dat, class)=="numeric")
+  valid <- which(sapply(tdObject$dat, is.numeric))
   if(length(valid) < ncol(tdObject$dat)){
     if(length(valid)==0){
       stop("Dataset does not contain any numeric data that can be used for continuous ancestral state reconstruction") }
     else {
-      not.valid <- colnames(tdObject$dat)[which(sapply(tdObject$dat, class)!= "numeric")]
+      not.valid <- colnames(tdObject$dat)[which(sapply(tdObject$dat, is.numeric))]
       warning(paste("Not all data continuous, dropping non-numeric data columns:", paste(not.valid, collapse=" ")))
       tdObject <- select(tdObject, valid)
     }
@@ -238,7 +238,7 @@ checkFactor <- function(tdObject, return.factor=TRUE) {
   valid <- which(classes=="factor")
   if(length(valid) < ncol(tdObject$dat)){
     #Which data are numeric
-    are.numeric <- which(classes=="numeric")
+    are.numeric <- which(classes %in% c("numeric", "integer"))
     if(length(are.numeric) > 0){
       warning("Data contain numeric entries, which will be converted to factors for discrete ancestral state reconstruction")
       #convert them to factors
