@@ -29,22 +29,20 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 	
 	# check that the data actually make sense - this is a pretty weak test
 	if(charType=="continuous") {
-		if(!checkNumeric(td)) stop("Data contains factors, which cannot be used for continuous ancestral state reconstruction")
+    td <- checkNumeric(td, return.numeric=TRUE)
 	}
 	if(charType=="discrete") {
-		if(!checkFactor(td)) warning("Data contains numeric entries, which will be converted to factors for discrete ancestral state reconstruction")
+	  td <- checkFactor(td, return.factor=TRUE)
 	}
 	
-	#JOSEF: can you figure out a way to NOT have to send names separately?
-	res<-lapply(td$dat, function(x) aceArborCalculator(td$phy, x, charType, aceType, discreteModelType, names=rownames(td$dat)))
+	res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, aceType, discreteModelType))
 	
 	# Note discrete "joint" and "MCMC" return weird stuff and don't work
 	return(res)
-		
-		
+	
 }	
 
-aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal", discreteModelType="ER", mcmcGen=10000, mcmcBurnin=1000, names=NULL) {
+aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal", discreteModelType="ER", mcmcGen=10000, mcmcBurnin=1000) {
 	
 	# this function requires a phylo object
  	# and a dat

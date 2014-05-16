@@ -41,30 +41,30 @@ make.treedata <- function(tree, data, name_column=0) {
   dat <- filter(dat, dat.label %in% phy$tip.label)
   o <- match(dat.label, phy$tip.label)
   dat <- arrange(dat, o)
-  td <- list(phy=phy, data=dat)
+  td <- list(phy=phy, dat=dat)
   class(td) <- c("treedata", "list")
   attributes(td)$tip.label <- phy$tip.label
-  rownames(td$data) <- attributes(td)$tip.label
+  rownames(td$dat) <- attributes(td)$tip.label
   return(td)
 }
 
 #' @export
 mutate.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]])) stop("No expressions provided to add to the treedata object")
-  dat <- dplyr:::mutate_impl(tdObject$data, dplyr:::named_dots(...), environment())
-  tdObject$data <- dat
-  rownames(tdObject$data) <- attributes(tdObject)$tip.label
+  dat <- dplyr:::mutate_impl(tdObject$dat, dplyr:::named_dots(...), environment())
+  tdObject$dat <- dat
+  rownames(tdObject$dat) <- attributes(tdObject)$tip.label
   return(tdObject)
 }
 
 #' @export
 select.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for selection")
-  vars <- select_vars(names(tdObject$data), ..., env = parent.frame())
-  dat <- dplyr:::select_impl(tdObject$data, vars)
-  #dat <- lapply(dat, function(x){names(x) <- tdObject$data[,1]; x})
-  tdObject$data <- dat
-  rownames(tdObject$data) <- attributes(tdObject)$tip.label
+  vars <- select_vars(names(tdObject$dat), ..., env = parent.frame())
+  dat <- dplyr:::select_impl(tdObject$dat, vars)
+  #dat <- lapply(dat, function(x){names(x) <- tdObject$dat[,1]; x})
+  tdObject$dat <- dat
+  rownames(tdObject$dat) <- attributes(tdObject)$tip.label
   return(tdObject)
 }
 
@@ -74,11 +74,11 @@ select.treedata <- function(tdObject, ...){
 #' @export
 filter.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for filtering")
-  tdObject$data <- mutate(tdObject$data, tip.label=attributes(tdObject)$tip.label)
-  tdObject$data <- filter(tdObject$data, ...)
-  attributes(tdObject)$tip.label <- tdObject$data$tip.label
-  tdObject$data <- select(tdObject$data, 1:(ncol(tdObject$data)-1))
-  rownames(tdObject$data) <- attributes(tdObject)$tip.label
+  tdObject$dat <- mutate(tdObject$dat, tip.label=attributes(tdObject)$tip.label)
+  tdObject$dat <- filter(tdObject$dat, ...)
+  attributes(tdObject)$tip.label <- tdObject$dat$tip.label
+  tdObject$dat <- select(tdObject$dat, 1:(ncol(tdObject$dat)-1))
+  rownames(tdObject$dat) <- attributes(tdObject)$tip.label
   tdObject$phy <- drop.tip(tdObject$phy, tdObject$phy$tip.label[!(tdObject$phy$tip.label %in% attributes(tdObject)$tip.label)])
   return(tdObject)
 }
@@ -86,14 +86,14 @@ filter.treedata <- function(tdObject, ...){
 #' @export
 summarize.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]]))  stop("No expression provided to summarize data")
-  res <- summarize(tdObject$data, ...)
+  res <- summarize(tdObject$dat, ...)
   return(res)
 }
 
 #' @export
 summarise.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]])) stop("No expression provided to summarize data")
-  res <- summarise(tdObject$data, ...)
+  res <- summarise(tdObject$dat, ...)
   return(res)
 }
 
@@ -183,7 +183,7 @@ treedply.treedata <- function(tdObject, ...){
   }
   env <- new.env(parent = parent.frame(), size = 1L)
   env$phy <- tdObject$phy
-  env$dat <- tdObject$data
+  env$dat <- tdObject$dat
   out <- eval(call, env)
   if(is.null(out)){
     invisible()
@@ -215,12 +215,54 @@ print.treedata <- function(tdObject, ...){
   print(tdObject$dat)
 }
 
-checkNumeric <- function(tdObject) {
-	dataClasses<-lapply(tdObject$data, class)
-	return(all(dataClasses=="numeric"))
+checkNumeric <- function(tdObject, return.numeric=TRUE) {
+  valid <- which(sapply(tdObject$dat, class)=="numeric")
+  if(length(valid) < ncol(tdObject$dat)){
+    if(length(valid)==0){
+      stop("Dataset does not contain any numeric data that can be used for continuous ancestral state reconstruction") }
+    else {
+      not.valid <- colnames(tdObject$dat)[which(sapply(tdObject$dat, class)!= "numeric")]
+      warning(paste("Not all data continuous, dropping non-numeric data columns:", paste(not.valid, collapse=" ")))
+      tdObject <- select(tdObject, valid)
+    }
+  }
+  if(return.numeric){
+    return(tdObject)
+  } else {
+    invisible()
+  }
 }
 
-checkFactor <- function(tdObject) {
-	dataClasses<-lapply(tdObject$data, class)
-	return(all(dataClasses=="factor"))
+checkFactor <- function(tdObject, return.factor=TRUE) {
+  classes <- sapply(tdObject$dat, class)
+  valid <- which(classes=="factor")
+  if(length(valid) < ncol(tdObject$dat)){
+    #Which data are numeric
+    are.numeric <- which(classes=="numeric")
+    if(length(are.numeric) > 0){
+      warning("Data contain numeric entries, which will be converted to factors for discrete ancestral state reconstruction")
+      #convert them to factors
+      tdObject$dat[, are.numeric] <- lapply(tdObject$dat[,are.numeric], factor)
+      ##Check to see if converted data has any columns that appear continuous
+      classes <- sapply(tdObject$dat, class)
+      valid <- which(classes=="factor")
+      too.many.levels <- which(sapply(tdObject$dat,function(x) length(unique(x)))==nrow(tdObject$dat))
+      if(length(too.many.levels) > 0){
+        warning(paste("Conversion failed for data columns", paste(colnames(tdObject$dat)[too.many.levels], collapse=" "), "as these data have no shared states. These data will be removed", sep=" "))
+        valid <- valid[which(!(valid %in% too.many.levels))]
+      }
+    }
+
+    if(length(valid)==0){
+      stop("Data does not contain any data that can be used for discrete ancestral state reconstruction") 
+    } else {
+      tdObject$dat <- select(tdObject$dat, valid)
+    }
+  }
+  if(return.factor){
+    return(tdObject)
+  } else {
+    invisible()
+  }
 }
+
