@@ -12,6 +12,10 @@
 #' @export
 make.treedata <- function(tree, data, name_column=0) {
   if(class(tree)!="phylo") stop("tree must be of class 'phylo'")
+  if(is.vector(data)){
+    data <- as.matrix(data)
+    colnames(data) <- "trait"
+  }
   coln <- colnames(data)
   if(name_column==0){
     dat.label <- rownames(data)
