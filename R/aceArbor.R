@@ -70,6 +70,7 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 		k<-nlevels(fdat)
 		
 		ndat<-as.numeric(fdat)
+    names(ndat) <- names(fdat)
 		
 		if(!is.null(names)) names(ndat)<-names
 		
