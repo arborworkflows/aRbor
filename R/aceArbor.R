@@ -148,7 +148,7 @@ plot.asrArbor <- function(asrArbor, ...){
     charStates <- attributes(asrArbor)$charStates
     if("list" %in% class(asrArbor)){
       for(i in 1:length(asrArbor)){
-        par(ask=TRUE)
+        if(length(asrArbor) > 1) par(ask=TRUE)
         plotDiscreteReconstruction(td$phy, asrArbor[[i]], td$dat[,i], charStates[[i]], main=colnames(td$dat)[i], ...)
       }
       par(ask=FALSE)
@@ -159,7 +159,7 @@ plot.asrArbor <- function(asrArbor, ...){
   if(type=="continuous"){
     if("list" %in% class(asrArbor)){
       for(i in 1:length(asrArbor)){
-        par(ask=TRUE)
+        if(length(asrArbor) > 1) par(ask=TRUE)
         plotContAce(td, colnames(td$dat)[i], asrArbor[[i]],  ...)
       }
       par(ask=FALSE)
@@ -173,8 +173,7 @@ print.asrArbor <- function(x, ...){
   names <- attributes(x)$names
   attributes(x) <- NULL
   attributes(x)$names <-  names
-  x <- lapply(x, tbl_df)
-  lapply(1:length(x), function(i){ cat(paste(names(x)[i], "\n")); print(head(x[[i]]))})
+  print(x)
 }
 
 plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue", "lightblue", "green", "yellow", "red")), n=100, adjp=c(0.5,0.5), cex=1, ...){
