@@ -4,19 +4,24 @@
 #' 
 #' @param tree An object of class 'phylo'
 #' @param data A data frame or matrix
-#' @param name_column The column of \code{data} that contains the names to be matched to the tree. By default, it is set to 0, which indicates row names.
+#' @param name_column The column of \code{data} that contains the names to be matched to the tree. By default, it is set to "detect" which finds the column with the most matches to the tree (including the rownames).
 #' @return An object of class "\code{treedata}". The tree is pruned of tips not represented in the data, and the data is filtered for taxa not in the tree. The data is returned as a data frame tble that is compatible with \code{dplyr} functions. 
 #' @examples
 #' data(anolis)
 #' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
 #' @export
-make.treedata <- function(tree, data, name_column=0) {
+make.treedata <- function(tree, data, name_column="detect") {
   if(class(tree)!="phylo") stop("tree must be of class 'phylo'")
   if(is.vector(data)){
     data <- as.matrix(data)
     colnames(data) <- "trait"
   }
   coln <- colnames(data)
+  if(name_column=="detect"){
+    matches <- sapply(data.frame(rownames(data), data), function(x) sum(x %in% tree$tip.label))
+    if(all(matches==0)) stop("No matching names found between data and tree")
+    name_column <- which(matches==max(matches))-1
+  }
   if(name_column==0){
     dat.label <- rownames(data)
   } 
@@ -67,9 +72,6 @@ select.treedata <- function(tdObject, ...){
   rownames(tdObject$dat) <- attributes(tdObject)$tip.label
   return(tdObject)
 }
-
-
-
 
 #' @export
 filter.treedata <- function(tdObject, ...){
@@ -215,6 +217,7 @@ print.treedata <- function(tdObject, ...){
   print(tdObject$dat)
 }
 
+#' @export
 checkNumeric <- function(tdObject, return.numeric=TRUE) {
   valid <- which(sapply(tdObject$dat, is.numeric))
   if(length(valid) < ncol(tdObject$dat)){
@@ -233,6 +236,7 @@ checkNumeric <- function(tdObject, return.numeric=TRUE) {
   }
 }
 
+#' @export
 checkFactor <- function(tdObject, return.factor=TRUE) {
   classes <- sapply(tdObject$dat, class)
   valid <- which(classes=="factor")

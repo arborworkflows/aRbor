@@ -2,7 +2,7 @@
 \alias{make.treedata}
 \title{Function for making an object of class 'treedata'}
 \usage{
-  make.treedata(tree, data, name_column = 0)
+  make.treedata(tree, data, name_column = "detect")
 }
 \arguments{
   \item{tree}{An object of class 'phylo'}
@@ -11,7 +11,8 @@
 
   \item{name_column}{The column of \code{data} that
   contains the names to be matched to the tree. By default,
-  it is set to 0, which indicates row names.}
+  it is set to "detect" which finds the column with the
+  most matches to the tree (including the rownames).}
 }
 \value{
   An object of class "\code{treedata}". The tree is pruned

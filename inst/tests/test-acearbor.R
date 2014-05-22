@@ -10,12 +10,13 @@ test_that("aceArbor marginal ancestral state reconstruction works", {
   ##Make sure checkNumeric and checkFactor properly convert the data:
   expect_true(all(sapply(tdDiscrete$dat, is.factor)))
 	expect_true(all(sapply(tdContinuous$dat, is.numeric)))
-  
   aaRes<-aceArbor(td, charType="continuous")
-	
+	#plot(aaRes, adj=c(0.5, 0.5))
+  
 	# since aceArbor uses fastAnc from phytools, we can compare to ape
 	dd<-getVector(td$dat, 1)
 	aceRes<-ace(dd, td$phy, method="ML")
-	expect_equal(aaRes[[1]]$ancestralStates[,2], aceRes$ace,  tolerance=0.000001)
-	
+	expect_equal(aaRes[[1]][,2], unname(aceRes$ace),  tolerance=0.000001)
+  ddRes <- aceArbor(tdDiscrete, charType="discrete", aceType="marginal")
+  #plot(ddRes, type="fan")
 })

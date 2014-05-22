@@ -12,7 +12,7 @@ test_that("treedata can handle matrix/dataframe input", {
   expect_equal(td1$dat$SVL, td2$dat$SVL,  tolerance=0.000001)
   expect_equal(td1$dat$island, td2$dat$island)
   expect_equal(td3$dat$SVL, td4$dat$SVL,  tolerance=0.000001)
-  expect_equal(td3$phy$tip.label, rownames(td3$data))
-  expect_equal(td4$phy$tip.label, rownames(td4$data))
+  expect_equal(td3$phy$tip.label, rownames(td3$dat))
+  expect_equal(td4$phy$tip.label, rownames(td4$dat))
   
 })

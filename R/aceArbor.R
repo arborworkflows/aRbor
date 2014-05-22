@@ -36,8 +36,16 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 	}
 	
 	res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, aceType, discreteModelType))
-	
+	class(res) <- c("asrArbor", class(res))
+  attributes(res)$td <- td
+	attributes(res)$charType <- charType
+	attributes(res)$aceType <- aceType
+  if(charType=="discrete"){
+    attributes(res)$discreteModelType = discreteModelType
+    attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[,x]))
+  }
 	# Note discrete "joint" and "MCMC" return weird stuff and don't work
+	names(res) <- colnames(td$dat)
 	return(res)
 	
 }	
@@ -90,11 +98,11 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 	} else if(ctype=="continuous") {
 		if(aceType=="marginal") {
 			zz<-fastAnc(phy, dat, CI=T)
-			ancestralStates<-cbind(zz$CI95[,1], zz$ace, zz$CI95[,2])
+			ancestralStates<-data.frame(lowerCI95 = zz$CI95[,1], estimate = zz$ace, upperCI95=zz$CI95[,2])
 			rownames(ancestralStates)<-names(zz$ace)
 			names(dat)<-phy$tip.label 
 			#phenogram(phy, dat)
-			return(list(ancestralStates= ancestralStates))
+			return(ancestralStates)
 		} else if (aceType=="MCMC") {
 			names(dat)<-phy$tip.label 
 			bayesOutput<-anc.Bayes(phy, dat, ngen= mcmcGen)
@@ -126,11 +134,77 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	zz		
 }
 
-plotDiscreteReconstruction<-function(phy, zz, dat, charStates) {
-	plot(phy, main="ASR")
-	nodelabels(pie=zz, piecol=1:2, cex=.5, frame="circle")
-	tiplabels(pch=21, bg=as.numeric(factor(dat))) 
-	legend("bottomleft", fill=1:2, legend=charStates)
+plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, ...) {
+	plot(phy, ...)
+	nodelabels(pie=zz, piecol=pal(length(charStates)), cex=.5, frame="circle")
+	tiplabels(pch=21, bg=pal(length(charStates))[as.numeric(factor(dat, levels=charStates))]) 
+	legend("bottomleft", fill=pal(length(charStates)), legend=charStates)
+}
+
+plot.asrArbor <- function(asrArbor, ...){
+  type <- attributes(asrArbor)$charType
+  td <- attributes(asrArbor)$td
+  if(type=="discrete"){
+    charStates <- attributes(asrArbor)$charStates
+    if("list" %in% class(asrArbor)){
+      for(i in 1:length(asrArbor)){
+        par(ask=TRUE)
+        plotDiscreteReconstruction(td$phy, asrArbor[[i]], td$dat[,i], charStates[[i]], main=colnames(td$dat)[i], ...)
+      }
+      par(ask=FALSE)
+    } else {
+      plotDiscreteReconstruction(td$phy, asrArbor, td$dat, charStates, colnames(td$dat)[i], ...)
+    }
+  }
+  if(type=="continuous"){
+    if("list" %in% class(asrArbor)){
+      for(i in 1:length(asrArbor)){
+        par(ask=TRUE)
+        plotContAce(td, colnames(td$dat)[i], asrArbor[[i]],  ...)
+      }
+      par(ask=FALSE)
+    } else {
+        plotContAce(td, colnames(td$dat)[1], asrArbor, ...)
+    }
+  }
+}
+
+print.asrArbor <- function(x, ...){
+  names <- attributes(x)$names
+  attributes(x) <- NULL
+  attributes(x)$names <-  names
+  x <- lapply(x, tbl_df)
+  lapply(1:length(x), function(i){ cat(paste(names(x)[i], "\n")); print(head(x[[i]]))})
+}
+
+plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue", "lightblue", "green", "yellow", "red")), n=100, adjp=c(0.5,0.5), cex=1, ...){
+  plot(td$phy, ...)
+  lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
+  node <- (lastPP$Ntip + 1):length(lastPP$xx)
+  XX <- lastPP$xx[node]
+  YY <- lastPP$yy[node]
+  make.index <- function(n=100, min, max){
+    fn <- function(x){
+      ramp <- seq(min, max, length.out=n)
+      sapply(x, function(x) which(abs(x-ramp)==min(abs(x-ramp))))
+    }
+    attributes(fn)$n <- n
+    return(fn)
+  }
+  errorpolygon <- function(x, y, lo, est, hi, pal, indexfn, cex=1, adj=c(0.75, 0.5)){
+    n <- attributes(indexfn)$n
+    lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
+    cex.x.scalar <- cex/(100*diff(lastPP$x.lim))*adj[2]
+    cex.yh.scalar <- (indexfn(hi)-indexfn(est))*adj[1]*diff(lastPP$y.lim)/n
+    cex.yl.scalar <- (indexfn(est)-indexfn(lo))*adj[1]*diff(lastPP$y.lim)/n
+    polygon(matrix(c(x, y+cex.yh.scalar, x-cex.x.scalar, y, x+cex.x.scalar, y), byrow=TRUE, ncol=2), border=NA, col=pal(n)[indexfn(hi)])
+    polygon(matrix(c(x, y-cex.yl.scalar, x-cex.x.scalar, y, x+cex.x.scalar, y), byrow=TRUE, ncol=2), border=NA, col=pal(n)[indexfn(lo)])
+    points(x, y, pch=21, cex=cex, col=pal(n)[indexfn(est)], bg=pal(n)[indexfn(est)])
+  }
+  get.index <- make.index(100, min(asr), max(asr))
+  gb <- lapply(1:length(XX), function(i) errorpolygon(XX[i], YY[i], asr[i,1], asr[i,2], asr[i,3], pal=pal, indexfn=get.index, cex=cex, adj=adjp))
+  add.color.bar(0.5, pal(100), title = trait, lims <- c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
+  tiplabels(pch=21, bg=pal(100)[get.index(td$dat[,trait])], col=pal(100)[get.index(td$dat[,trait])] ,cex=cex)
 }
 
 
