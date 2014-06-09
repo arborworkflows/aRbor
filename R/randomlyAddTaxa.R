@@ -1,34 +1,29 @@
 #' Add species into phylogeny near hypothesized relatives
 #'
-#' Given two data frames, one of species in an accepted phylogeny and their corresponding
-#' taxonomic assignment, and another of species to be bound in, along with their taxonomic
-#' assignment, will bind the missing species in next to a taxonomic relative.
+#' Given a data frame of species and taxonomic assignments, and an accepted phylogeny with
+#' some of those species in it, will add the missing species in next to a taxonomic 
+#' relative.
 #'
 #' @param tree An ape-style phylogenetic tree
-#' @param realGroupings A data frame with values of class character. First column,
-#' "species", must match a value in tree. Second column, "group", provides the taxonomic
-#' assignment of that species. 
-#' @param possGroupings A data frame with values of class character. First column,
-#' "species", are tips to be added into the input tree. Second column, "group", provides
-#' the taxonomic assignment of that species.
-#' @param noRandomTrees The number of desired final trees with all species from 
-#' possGroupings added.
-#' @param saveToFile Default is FALSE. To automatically save the multiPhylo object to file
+#' @param groupings A data frame with two columns, "species" and "group". Missing species,
+#' to be added, are taken as those that do not match a value in the tip labels of tree.
+#' @param noRandomTrees The number of desired final trees with all missing species from 
+#' groupings added.
+#' @param printToScreen Default is TRUE. Will print a list of the missing taxa to screen.
+#' @param saveToFile Default is FALSE. To automatically save multiPhylo object to file,
 #' set to TRUE. The object will not be stored directly in memory, but it is calculated in
 #' memory. The function could probably be sped up by having this save directly to file,
 #' appending each tree instead of first saving them all to memory.
 #' 
-#' @details Given two data frames with values class CHARACTER (it is critical they are 
-#' not of class factor), both with column names c("species", "group"), will take a species,
-#' e.g., spA from the possGroupings data frame, find a species in the realGroupings frame, 
-#' e.g., spB with the the same taxonomic group, and bind spA into the tree by creating a
-#' new node at half the distance between spB and its most recent common ancestor. spA is 
-#' assigned a branch length from the new node of half the original distance of the spB
-#' to its original most recent common ancestor. Thus, if the input trees are ultrametric,
-#' the output trees should also remain ultrametric. Currently, no effort is made to ensure
-#' that the input data frames truly are of class character, nor is any effort made to
-#' confirm that all taxonomic groups from possGroupings are to be found in realGroupings.
-#' These checks should be built in at some point.
+#' @details Given a data frame of two columns, "species" and "group", will take a species
+#' that is absent from the phylogeny and bind it in as a sister to one of its taxonomic
+#' relatives. A new node is created at half the distance between the existing species and
+#' its most recent common ancestor. The new species is assigned
+#' a branch length from the new node of half the original distance edge length of the
+#' existing species to its original most recent common ancestor. Thus, if the input trees 
+#' are ultrametric, the output trees should remain so. Currently, no effort is made to
+#' ensure that the taxonomic groups of the missing species are actually to be found in the
+#' species in the input tree.
 #'
 #' @return A multiPhylo object with number of trees as determined by noRandomTrees
 #'
@@ -36,11 +31,37 @@
 #'
 #' @references Eliot Miller unpublished
 #'
-#' @examples x<-1
+#' @examples
+#' #create a dummy tree
+#' s <- "dummy(((Silly_aluco:4.2,Silly_otus:4.2):3.1,Lesssilly_noctua:7.3):6.3,Forreal_alba:13.5);"
+#' cat(s, file = "ex.tre", sep = "\n")
+#' dummy.tree <- read.tree("ex.tre")
+#' #create a data frame of all taxa, including missing species
+#' species <- c("Silly_aluco","Silly_otus","Silly_joke","Lesssilly_noctua","Forreal_alba","Notsosilly_blanca")
+#' group <- c(rep("Silly_group", 3), "Lesssilly_group", "Forreal_group", "Forreal_group")
+#' dummy.frame <- data.frame(species, group)
+#' #run the function
+#' test <- randomlyAddTaxa(tree=dummy.tree, groupings=dummy.frame, noRandomTrees=10)
 
-randomlyAddTaxa <- function(tree, realGroupings, possGroupings, noRandomTrees, saveToFile=FALSE)
+randomlyAddTaxa <- function(tree, groupings, noRandomTrees, printToScreen=TRUE, saveToFile=FALSE)
 {
-	require(phytools)
+	#set the species and group to character vectors
+	groupings$species <- as.character(groupings$species)
+	groupings$group <- as.character(groupings$group)
+
+	#subset the groupings to those we have phylogenetic information for	
+	realGroupings <- groupings[groupings$species %in% tree$tip.label, ]
+
+	#and those we only have taxonomic information for
+	possGroupings <- groupings[!(groupings$species %in% tree$tip.label), ]
+
+	if(printToScreen==TRUE)
+	{
+		print("You are missing phylogenetic information for these species:", quote=FALSE)
+		print(possGroupings$species)
+	}
+
+	#set up an empty list to save the results into
 	random.trees <- list()
 	for(i in 1:noRandomTrees)
 	{
