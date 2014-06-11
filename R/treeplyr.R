@@ -44,6 +44,7 @@ make.treedata <- function(tree, data, name_column="detect") {
   tree_not_data <- setdiff(tree$tip.label, dat.label)
   phy <- drop.tip(tree, tree_not_data)
   dat <- filter(dat, dat.label %in% phy$tip.label)
+  dat.label <- dat.label[dat.label %in% phy$tip.label]
   o <- match(dat.label, phy$tip.label)
   dat <- arrange(dat, o)
   td <- list(phy=phy, dat=dat)
@@ -246,7 +247,7 @@ checkFactor <- function(tdObject, return.factor=TRUE) {
     if(length(are.numeric) > 0){
       warning("Data contain numeric entries, which will be converted to factors for discrete ancestral state reconstruction")
       #convert them to factors
-      tdObject$dat[, are.numeric] <- lapply(tdObject$dat[,are.numeric], factor)
+      tdObject$dat[, are.numeric] <- lapply(as.data.frame(tdObject$dat[,are.numeric]), factor)
       ##Check to see if converted data has any columns that appear continuous
       classes <- sapply(tdObject$dat, class)
       valid <- which(classes=="factor")
