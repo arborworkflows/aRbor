@@ -19,7 +19,7 @@
 #' @param discreteModelType One of ER, SYM, or ARD; see geiger's fitDiscrete for full description
 #' @param plot If true, make a plot of ancestral states.
 
-aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER") {
+aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER", na.rm="bytrait") {
 	
 	# check character type
 	ctype = match.arg(charType, c("discrete", "continuous"))
@@ -35,14 +35,31 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 	  td <- checkFactor(td, return.factor=TRUE)
 	}
 	
-	res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, aceType, discreteModelType))
-	class(res) <- c("asrArbor", class(res))
+  if(any(is.na(td$dat))){
+    if(na.rm=="bytrait"){
+      res <- lapply(1:ncol(td$dat), function(i) {
+        tdi <- select(td, i);
+        tdi <- filter(tdi, !is.na(tdi$dat[,1]));
+        aceArborCalculator(tdi$phy, setNames(tdi$dat[,1], rownames(tdi$dat)), charType, aceType, discreteModelType)
+      })
+    }
+    if(na.rm=="all"){
+      td <- filter(td, apply(apply(td$dat, 1, function(x) !is.na(x)), 2, all))
+      res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, aceType, discreteModelType))
+    }
+  } else {
+	  res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, aceType, discreteModelType))
+  }
+  class(res) <- c("asrArbor", class(res))
   attributes(res)$td <- td
 	attributes(res)$charType <- charType
 	attributes(res)$aceType <- aceType
   if(charType=="discrete"){
     attributes(res)$discreteModelType = discreteModelType
     attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[,x]))
+  }
+  if(any(is.na(td$dat))){
+    attributes(res)$na.drop <- lapply(td$dat, function(x) rownames(td$dat)[which(is.na(x))])
   }
 	# Note discrete "joint" and "MCMC" return weird stuff and don't work
 	names(res) <- colnames(td$dat)
@@ -134,26 +151,27 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	zz		
 }
 
-plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, ...) {
+plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=1, cex.asr=0.5, ...) {
 	plot(phy, ...)
-	nodelabels(pie=zz, piecol=pal(length(charStates)), cex=.5, frame="circle")
-	tiplabels(pch=21, bg=pal(length(charStates))[as.numeric(factor(dat, levels=charStates))]) 
+	nodelabels(pie=zz, piecol=pal(length(charStates)), cex=cex.asr, frame="circle")
+	tiplabels(pch=21, bg=pal(length(charStates))[as.numeric(factor(dat, levels=charStates))], cex=cex) 
 	legend("bottomleft", fill=pal(length(charStates)), legend=charStates)
 }
 
 plot.asrArbor <- function(asrArbor, ...){
   type <- attributes(asrArbor)$charType
   td <- attributes(asrArbor)$td
+  na.drop <- attributes(asrArbor)$na.drop
   if(type=="discrete"){
     charStates <- attributes(asrArbor)$charStates
     if("list" %in% class(asrArbor)){
       for(i in 1:length(asrArbor)){
         if(length(asrArbor) > 1) par(ask=TRUE)
-        plotDiscreteReconstruction(td$phy, asrArbor[[i]], td$dat[,i], charStates[[i]], main=colnames(td$dat)[i], ...)
+        plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), asrArbor[[i]], td$dat[!(rownames(td$dat) %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
       }
       par(ask=FALSE)
     } else {
-      plotDiscreteReconstruction(td$phy, asrArbor, td$dat, charStates, colnames(td$dat)[i], ...)
+      plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[1]]), asrArbor, td$dat[!(rownames(td$dat) %in% na.drop[[1]])], charStates, colnames(td$dat)[i], ...)
     }
   }
   if(type=="continuous"){
@@ -176,7 +194,7 @@ print.asrArbor <- function(x, ...){
   print(x)
 }
 
-plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue", "lightblue", "green", "yellow", "red")), n=100, adjp=c(0.5,0.5), cex=1, ...){
+plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue", "lightblue", "green", "yellow", "red")), n=100, adjp=c(0.5,0.5), cex.asr=1, cex=1, ...){
   plot(td$phy, ...)
   lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
   node <- (lastPP$Ntip + 1):length(lastPP$xx)
@@ -190,18 +208,18 @@ plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue"
     attributes(fn)$n <- n
     return(fn)
   }
-  errorpolygon <- function(x, y, lo, est, hi, pal, indexfn, cex=1, adj=c(0.75, 0.5)){
+  errorpolygon <- function(x, y, lo, est, hi, pal, indexfn, cex.asr=1, adj=c(0.75, 0.5)){
     n <- attributes(indexfn)$n
     lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
-    cex.x.scalar <- cex/(100*diff(lastPP$x.lim))*adj[2]
+    cex.x.scalar <- cex.asr/(100*diff(lastPP$x.lim))*adj[2]
     cex.yh.scalar <- (indexfn(hi)-indexfn(est))*adj[1]*diff(lastPP$y.lim)/n
     cex.yl.scalar <- (indexfn(est)-indexfn(lo))*adj[1]*diff(lastPP$y.lim)/n
     polygon(matrix(c(x, y+cex.yh.scalar, x-cex.x.scalar, y, x+cex.x.scalar, y), byrow=TRUE, ncol=2), border=NA, col=pal(n)[indexfn(hi)])
     polygon(matrix(c(x, y-cex.yl.scalar, x-cex.x.scalar, y, x+cex.x.scalar, y), byrow=TRUE, ncol=2), border=NA, col=pal(n)[indexfn(lo)])
-    points(x, y, pch=21, cex=cex, col=pal(n)[indexfn(est)], bg=pal(n)[indexfn(est)])
+    points(x, y, pch=21, cex=cex.asr, col=pal(n)[indexfn(est)], bg=pal(n)[indexfn(est)])
   }
   get.index <- make.index(100, min(asr), max(asr))
-  gb <- lapply(1:length(XX), function(i) errorpolygon(XX[i], YY[i], asr[i,1], asr[i,2], asr[i,3], pal=pal, indexfn=get.index, cex=cex, adj=adjp))
+  gb <- lapply(1:length(XX), function(i) errorpolygon(XX[i], YY[i], asr[i,1], asr[i,2], asr[i,3], pal=pal, indexfn=get.index, cex.asr=cex.asr, adj=adjp))
   add.color.bar(0.5, pal(100), title = trait, lims <- c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
   tiplabels(pch=21, bg=pal(100)[get.index(td$dat[,trait])], col=pal(100)[get.index(td$dat[,trait])] ,cex=cex)
 }
