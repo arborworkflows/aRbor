@@ -7,8 +7,9 @@
 #' @param tree An ape-style phylogenetic tree
 #' @param groupings A data frame with two columns, "species" and "group". Missing species,
 #' to be added, are taken as those that do not match a value in the tip labels of tree.
-#' @ fromNode Whether species should be added in a "polytomy" with, "above" (more recently
-#' diverged), "below" (sister to), or "randomly" above or below the tip they are bound to.
+#' @ fromNode Whether species should be added in a "polytomy" with, "crown" (more recently
+#' diverged), "stem" (previously diverged), or "randomly" crown-wards or stem-wards from
+#' the tip they are bound to.
 #' @param noRandomTrees The number of desired final trees with all missing species from 
 #' groupings added.
 #' @param printToScreen Default is TRUE. Will print a list of the missing taxa to screen.
@@ -27,18 +28,17 @@
 #' but it results in more realistic-looking, less ladderized trees. Four distinct methods
 #' of adding new taxa are possible. With "polytomy", the new species is simply assigned to
 #' a tip. Both species end up with branch lengths to their most recent common ancestor of
-#' 0. With "above", the new species is bound in at half the distance between the species
-#' it is being bound to and that species' original parent node. With "below", the new
+#' 0. With "crown", the new species is bound in at half the distance between the species
+#' it is being bound to and that species' original parent node. With "stem", the new
 #' species is bound to the parent node of the species it was selected to be bound to. The
 #' new species is bound in at half the distance between the parent node and grandparent
-#' node. With "randomly", each new species is randomly bound either above or below,
-#' following the descriptions above. Note that even if "below" or "randomly" are chosen,
-#' if a species is to be bound to the sister species to all others (the most "basal"
-#' species in the phylogeny), it will automatically be bound either above (if below or
-#' randomly are selected) or in a polytomy. With all options, if the input tree is
-#' ultrametric, the output trees should remain so. Currently, no effort is made to
-#' ensure that the taxonomic groups of the missing species are actually to be found in the
-#' species in the input tree.
+#' node. With "randomly", each new species is randomly bound either crown-wards or
+#' stem-wards, following the descriptions above. Note that even if "stem" or "randomly" 
+#' are chosen, if a species is to be bound to the sister species to all others (the most
+#' "basal" species in the phylogeny), it will automatically be bound stem-wards. With all
+#' options, if the input tree is ultrametric, the output trees should remain so. 
+#' Currently, no effort is made to ensure that the taxonomic groups of the missing species
+#' are actually to be found in the species in the input tree.
 #'
 #' @return A multiPhylo object with number of trees as determined by noRandomTrees
 #'
@@ -66,8 +66,8 @@
 #'
 #' #examples of changing the fromNode argument. you can plot or write these trees out to
 #' #better see what the differences are
-#' above <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="above", noRandomTrees=10)
-#' below <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="below", noRandomTrees=10)
+#' crown <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="crown", noRandomTrees=10)
+#' stem <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="stem", noRandomTrees=10)
 #' polytomy <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="polytomy", noRandomTrees=10)
 
 randomlyAddTaxa <- function(tree, groupings, fromNode, noRandomTrees, printToScreen=TRUE, saveToFile=FALSE)
@@ -92,14 +92,16 @@ randomlyAddTaxa <- function(tree, groupings, fromNode, noRandomTrees, printToScr
 	#identity, the species that is connected to it, and the species group that species
 	#belongs to. figure out how many species are in the input tree from that group. if
 	#only 1, then make a list of species that have to be added above it, even if fromNode
-	#is set to "below" or "randomly"
+	#is set to "stem" or "randomly"
 	sisterToAll <- tree$tip.label[length(tree$tip.label)]
 	sisterGroup <- groupings$group[groupings$species==sisterToAll]
 	sisterGroupDF <- groupings[groupings$group==sisterGroup,]
 
-	if(sum(sisterGroupDF$species %in% bird.families$tip.label) == 1)
+	if(sum(!(sisterGroupDF$species %in% tree$tip.label)) == 1)
 	{
 		dangerList <- possGroupings$species[possGroupings$group==sisterGroup]
+		print("The following taxon/taxa could potentially be bound to the taxon that is sister to all others. Cannot add to stem of this taxon, so will always add this/these to crown:", quote=FALSE)
+		print(dangerList, quote=FALSE)
 	}
 	
 	else
@@ -118,7 +120,7 @@ randomlyAddTaxa <- function(tree, groupings, fromNode, noRandomTrees, printToScr
 			#added will be added above or below the node
 			if(fromNode=="randomly")
 			{
-				chooseFrom <- c("above","below")
+				chooseFrom <- c("crown","stem")
 				fromNodeUsed <- sample(chooseFrom,1)
 			}
 			
@@ -127,11 +129,11 @@ randomlyAddTaxa <- function(tree, groupings, fromNode, noRandomTrees, printToScr
 				fromNodeUsed <- fromNode
 			}
 
-			#add a line to automatically switch fromNode back to "above" if the species
+			#add a line to automatically switch fromNode back to "crown" if the species
 			#being added is on the danger list
-			if(possGroupings$species[j] %in% dangerList & (fromNode=="below" | fromNode=="randomly"))
+			if(possGroupings$species[j] %in% dangerList & (fromNode=="stem" | fromNode=="randomly"))
 			{
-				fromNodeUsed <- "above"
+				fromNodeUsed <- "crown"
 			}
 
 			#subset the groupings to those we have phylogenetic information for	
@@ -193,10 +195,10 @@ randomlyAddTaxa <- function(tree, groupings, fromNode, noRandomTrees, printToScr
 				new.tree <- bind.tip(tree=new.tree, tip.label=possGroupings$species[j], where=bindingTo, position=parentDistance/2)
 			}
 
-			#bind new species directly to randomly selected species if "above" is selected
+			#bind new species directly to randomly selected species if "crown" is selected
 			#give the new species a branch length of half the original distance of the
 			#selected species and its parent node
-			else if(bigEnough == 1 & fromNodeUsed == "above")
+			else if(bigEnough == 1 & fromNodeUsed == "crown")
 			{
 				new.tree <- bind.tip(tree=new.tree, tip.label=possGroupings$species[j], where=bindingTo, position=parentDistance/2)
 			}
@@ -209,10 +211,10 @@ randomlyAddTaxa <- function(tree, groupings, fromNode, noRandomTrees, printToScr
 				new.tree <- bind.tip(tree=new.tree, tip.label=possGroupings$species[j], where=bindingTo)
 			}
 
-			#bind new species to parent node if "below" is selected. give it an additional
+			#bind new species to parent node if "stem" is selected. give it an additional
 			#branch length of half the distance to the grand parent node (phytools will
 			#go ahead and make it ultrametric)
-			else if(bigEnough == 1 & fromNodeUsed == "below")
+			else if(bigEnough == 1 & fromNodeUsed == "stem")
 			{
 				new.tree <- bind.tip(tree=new.tree, tip.label=possGroupings$species[j], where=parent, position=grandparentDistance/2)
 				workAround <- write.tree(new.tree)
