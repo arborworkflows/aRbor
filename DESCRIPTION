@@ -13,4 +13,5 @@ Depends:
     picante,
     diversitree,
     phytools,
-    dplyr
+    dplyr,
+    RColorBrewer
