@@ -152,9 +152,9 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 }
 
 plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=1, cex.asr=0.5, ...) {
-	plot(phy, ...)
+	plot(phy, cex=cex, ...)
 	nodelabels(pie=zz, piecol=pal(length(charStates)), cex=cex.asr, frame="circle")
-	tiplabels(pch=21, bg=pal(length(charStates))[as.numeric(factor(dat, levels=charStates))], cex=cex) 
+	tiplabels(pch=21, bg=pal(length(charStates))[as.numeric(factor(dat, levels=charStates))], cex=2*cex.asr) 
 	legend("bottomleft", fill=pal(length(charStates)), legend=charStates)
 }
 
@@ -195,7 +195,7 @@ print.asrArbor <- function(x, ...){
 }
 
 plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue", "lightblue", "green", "yellow", "red")), n=100, adjp=c(0.5,0.5), cex.asr=1, cex=1, ...){
-  plot(td$phy, ...)
+  plot(td$phy, cex=cex, ...)
   lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
   node <- (lastPP$Ntip + 1):length(lastPP$xx)
   XX <- lastPP$xx[node]
@@ -221,7 +221,7 @@ plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue"
   get.index <- make.index(100, min(asr), max(asr))
   gb <- lapply(1:length(XX), function(i) errorpolygon(XX[i], YY[i], asr[i,1], asr[i,2], asr[i,3], pal=pal, indexfn=get.index, cex.asr=cex.asr, adj=adjp))
   add.color.bar(0.5, pal(100), title = trait, lims <- c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
-  tiplabels(pch=21, bg=pal(100)[get.index(td$dat[,trait])], col=pal(100)[get.index(td$dat[,trait])] ,cex=cex)
+  tiplabels(pch=21, bg=pal(100)[get.index(td$dat[,trait])], col=pal(100)[get.index(td$dat[,trait])] ,cex=2*cex.asr)
 }
 
 
