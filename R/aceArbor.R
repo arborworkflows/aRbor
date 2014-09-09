@@ -148,6 +148,7 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	fit<-find.mle(lik, setNames(rep(1,length(pnames)), argnames(lik)))
 	
 	zz<-t(asr.marginal(lik, coef(fit)))
+  attributes(zz)$fit <- fit
 	zz		
 }
 
@@ -239,6 +240,7 @@ getDiscreteAceJoint<-function(phy, ndat, k, discreteModelType) {
   zz<-matrix(0, nrow=length(xx), ncol=k)
 	zz[,1]<- apply(xx, 1, function(x) sum(x==1)/reps)
 	zz[,2]<- apply(xx, 1, function(x) sum(x==2)/reps)
+	attributes(zz)$fit <- fit
 	zz
 }
 
@@ -254,6 +256,7 @@ getDiscreteAceMCMC<-function(phy, ndat, k, discreteModelType) { # results do not
 	samples <- mcmc(lik, pars, 1000, w=1, prior=prior, print.every=10) # likewise, need control arguments here
 	aceSamp <- apply(samples[c(-1, -dim(samples)[2])], 1, asr.joint, lik=lik)
 	zz<-apply(aceSamp, 2, table)/1000
+	attributes(zz)$fit <- fit
 	t(zz)
 }
 	
