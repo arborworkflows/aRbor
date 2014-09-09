@@ -4,7 +4,7 @@
 #' @param prior Either "stationary" or "equal" 
 #' @param plot A logical indicating whether a plot should be produced
 #' @param pal A color palette to color the nodes
-validateASR <- function(asr, prior="stationary", plot=TRUE, pal="rainbow"){
+validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.tip=0.5, cex.lab=1, pal=rainbow, label.offset=0.1,...){
   ntips <- length(attributes(asr)$td$phy$tip.label)
   nnodes <- attributes(asr)$td$phy$Nnode
   model <- attributes(asr)$discreteModelType
@@ -48,7 +48,7 @@ validateASR <- function(asr, prior="stationary", plot=TRUE, pal="rainbow"){
   if(plot){
     cols<-setNames(pal(k)[1:k],sort(unique(states)))
     Probs <- t(probs)
-    plot(tree, type="fan", cex=cex.lab, label.offset=label.offset)#, ...)
+    plot(tree, type="fan", cex=cex.lab, label.offset=label.offset, ...)
     nodelabels(node=(ntips+1):(ntips+nnodes), pie=XX,piecol=cols,cex=cex.node)
     #tiplabels(tip=probs, pch=21, cex=2, bg="white", col="yellow")
     
