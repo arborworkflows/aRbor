@@ -4,7 +4,7 @@
 #' @param prior Either "stationary" or "equal" 
 #' @param plot A logical indicating whether a plot should be produced
 #' @param pal A color palette to color the nodes
-validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.tip=0.5, cex.lab=1, pal=rainbow, label.offset=0.1,...){
+validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.tip=0.5, cex.lab=1, cex.actual=5, pal=rainbow, label.offset=0.1,...){
   ntips <- length(attributes(asr)$td$phy$tip.label)
   nnodes <- attributes(asr)$td$phy$Nnode
   model <- attributes(asr)$discreteModelType
@@ -52,7 +52,7 @@ validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.ti
     nodelabels(node=(ntips+1):(ntips+nnodes), pie=XX,piecol=cols,cex=cex.node)
     #tiplabels(tip=probs, pch=21, cex=2, bg="white", col="yellow")
     
-    tiplabels(pch=21, bg=cols[states], col=cols[states], cex=cex.tip*5)
+    tiplabels(pch=21, bg=cols[states], col=cols[states], cex=cex.tip*cex.actual)
     tiplabels(pie=Probs,piecol=cols,cex=cex.tip)
     add.simmap.legend(colors=cols,prompt=FALSE,x=0.9*par()$usr[1],
                       y=-max(nodeHeights(tree)))
