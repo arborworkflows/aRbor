@@ -312,6 +312,12 @@ s_group_by = function(.data, ...) {
   eval.string.dplyr(.data,"group_by", ...)
 }
 
+#' Modified version of dplyr's group_by that uses string arguments
+#' @export
+s_treeply = function(.data, ...) {
+  eval.string.dplyr(.data,"treeply", ...)
+}
+
 #' Internal function used by s_filter, s_select etc.
 eval.string.dplyr = function(.data, .fun.name, ...) {
   args = list(...)
