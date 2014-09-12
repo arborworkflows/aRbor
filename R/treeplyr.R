@@ -318,6 +318,12 @@ s_treeply = function(.data, ...) {
   eval.string.dplyr(.data,"treeply", ...)
 }
 
+#' Modified version of dplyr's group_by that uses string arguments
+#' @export
+s_treedply = function(.data, ...) {
+  eval.string.dplyr(.data,"treedply", ...)
+}
+
 #' Internal function used by s_filter, s_select etc.
 eval.string.dplyr = function(.data, .fun.name, ...) {
   args = list(...)
