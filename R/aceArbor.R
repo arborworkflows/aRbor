@@ -139,10 +139,17 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 }
 
 getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
+	
+	if(discreteModelType =="ER") extra="q" else extra=NULL
+
 	lik<-make.mkn(phy, ndat, k=k)
 	con<-makeMkConstraints(k=k, modelType= discreteModelType)
+	ltemp<-lik
+	
 	if(!is.null(con))
-		lik<-constrain(lik, con)
+		for(i in 1:length(con)) ltemp<-constrain(ltemp, con[[i]], extra=extra)
+	
+	lik<-ltemp
 	
 	pnames<-argnames(lik)
 	fit<-find.mle(lik, setNames(rep(1,length(pnames)), argnames(lik)))
@@ -228,10 +235,14 @@ plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue"
 
 getDiscreteAceJoint<-function(phy, ndat, k, discreteModelType) {
 	reps <- 1000
+	
+	
+	if(discreteModelType =="ER") extra="q" else extra=NULL
+	
   lik<-make.mkn(phy, ndat, k=k)
 	con<-makeMkConstraints(k=k, modelType= discreteModelType)
 	if(!is.null(con))
-		lik<-constrain(lik, con)
+		lik<-constrain(lik, formulae=con, extra=extra)
 				
 	pnames<-argnames(lik)
 	fit<-find.mle(lik, setNames(rep(1,length(pnames)), argnames(lik)))
