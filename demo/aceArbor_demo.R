@@ -17,17 +17,18 @@ ytd<-make.treedata(tree, ydf)
 
 aceArbor(td=ytd, charType="discrete")
 
-aceArbor(td=ytd, colID=2, charType="discrete", discreteModelType="SYM")
-aceArbor(ytd, charType="discrete", discreteModelType="ARD") # there is an error here
+aceArbor(td=ytd, charType="discrete", discreteModelType="SYM")
+aceArbor(ytd, charType="discrete", discreteModelType="ARD")
 
-#aceArbor(tree, as.factor(y), charType="discrete")
-
-#aceArbor(tree, y-1, charType="discrete")
 
 
 pets<-c("cat", "dog")[y]
 names(pets)<-names(y)
-petdf<-as.data.frame(pets)
+x2<-sim.history(tree,Q)$states
+y2<-setNames(as.numeric(x),names(x))
+pets2<-c("pork", "beef")[y2]
+
+petdf<-as.data.frame(cbind(pets, pets2))
 pettd<-make.treedata(tree, petdf)
 
 aceArbor(pettd, charType="discrete")
