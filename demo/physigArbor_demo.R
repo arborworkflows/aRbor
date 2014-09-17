@@ -1,7 +1,7 @@
-library(phytools)
-library(diversitree)
-library(geiger)
-library(picante)
+#library(phytools)
+#library(diversitree)
+#library(geiger)
+#library(picante)
 
 tree<-pbtree(n=100, scale=1)
 Q<-matrix(c(-1,1,1,-1),2,2)

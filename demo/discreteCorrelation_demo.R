@@ -1,5 +1,5 @@
-library(phytools)
-library(diversitree)
+#library(phytools)
+#library(diversitree)
 
 
 tree<-pbtree(n=100, scale=1)
