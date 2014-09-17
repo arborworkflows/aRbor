@@ -19,7 +19,15 @@ continuousCorrelation<-function(td) {
       xvar<-vv[i]
       yvar<-vv[j]
       
-      res[[counter]]<-gls(reformulate(termlabels=xvar, response=yvar), correlation=corBrownian(phy=td$phy), data=td$dat)
+      goodPairs<- !is.na(td$dat[,i]) & !is.na(td$dat[,j])
+      
+      newDat<-td$dat[goodPairs,]
+      
+      badPairs<-!goodPairs
+      if(sum(badPairs) != 0)
+      	newPhy<-drop.tip(td$phy, rownames(td$dat)[badPairs])
+      
+      res[[counter]]<-gls(reformulate(termlabels=xvar, response=yvar), correlation=corBrownian(phy=newPhy), data= newDat)
       names(res)[counter]<-deparse(reformulate(termlabels=xvar, response=yvar))
       counter<-counter+1
     }

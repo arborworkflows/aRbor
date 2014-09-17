@@ -11,6 +11,7 @@ physigArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", d
 	signalTest = match.arg(signalTest, c("pagelLambda", "Blomberg", "garbageTest"))
 	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
 
+	missingSpecies<-is.na(dat)
 	
 	if(ctype=="discrete") {
 		# this changes the discrete data to 1:n and remembers the original charStates
