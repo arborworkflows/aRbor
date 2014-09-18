@@ -163,6 +163,7 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	zz		
 }
 
+#' @export
 plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=1, cex.asr=0.5, ...) {
 	plot(phy, cex=cex, ...)
 	nodelabels(pie=zz, piecol=pal(length(charStates)), cex=cex.asr, frame="circle")
@@ -170,6 +171,7 @@ plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=
 	legend("bottomleft", fill=pal(length(charStates)), legend=charStates)
 }
 
+#' @export
 plot.asrArbor <- function(asrArbor, ...){
   type <- attributes(asrArbor)$charType
   td <- attributes(asrArbor)$td
@@ -199,6 +201,7 @@ plot.asrArbor <- function(asrArbor, ...){
   }
 }
 
+#' @export
 print.asrArbor <- function(x, ...){
   names <- attributes(x)$names
   attributes(x) <- NULL
@@ -206,6 +209,7 @@ print.asrArbor <- function(x, ...){
   print(x)
 }
 
+#' @export
 plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue", "lightblue", "green", "yellow", "red")), n=100, adjp=c(0.5,0.5), cex.asr=1, cex=1, ...){
   plot(td$phy, cex=cex, ...)
   lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
