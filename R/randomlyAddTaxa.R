@@ -54,7 +54,7 @@
 #' data(bird.families)
 #'
 #' #create a data frame of all taxa from the phylogeny, and make up species groups
-#' for each.
+#' #for each.
 #' dummy.frame <- data.frame(species=bird.families$tip.label, 
 #' group=c(rep("nonPasserine", 95), rep("suboscine", 9), rep("basalOscine", 13), 
 #' rep("oscine", 20)))
