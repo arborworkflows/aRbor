@@ -15,6 +15,7 @@
 #' 		\item{"marginal"}{marginal ancestral state reconstructions, which reconstruct each node integrating over all possibilities at all other nodes in the tree; this is typically the method used in the literature to reconstruce ACEs}
 #' 		\item{"joint"}{joint ancestral reconstructions, which give the configuration of ancestral states that together maximize the likelihood of the data given model parameters}	
 #' 		\item{"mcmc"}{reconstruct ancestral states using Bayesian MCMC. Note that the discrete version of this doesn't seem to work, and even if it did work it is not a full MCMC ancestral state method}
+#'		\item{"stochastic"}{create stochastic character map}
 #'	}	
 #' @param discreteModelType One of ER, SYM, or ARD; see geiger's fitDiscrete for full description
 #' @param plot If true, make a plot of ancestral states.
@@ -24,7 +25,7 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 	# check character type
 	ctype = match.arg(charType, c("discrete", "continuous"))
 	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
-	aceType = match.arg(aceType, c("marginal", "joint", "MCMC"))
+	aceType = match.arg(aceType, c("marginal", "joint", "MCMC", "stochastic"))
 	
 	
 	# check that the data actually make sense - this is a pretty weak test
@@ -85,7 +86,7 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 	# check character type
 	ctype = match.arg(charType, c("discrete", "continuous"))
 	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
-	aceType = match.arg(aceType, c("marginal", "joint", "MCMC"))
+	aceType = match.arg(aceType, c("marginal", "joint", "MCMC", "stochastic"))
 	
 	if(ctype=="discrete") {
 		
@@ -95,7 +96,7 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 		k<-nlevels(fdat)
 		
 		ndat<-as.numeric(fdat)
-    names(ndat) <- names(fdat)
+    	names(ndat) <- names(fdat)
 		
 		if(!is.null(names)) names(ndat)<-names
 		
@@ -105,11 +106,13 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 			zz<- getDiscreteAceJoint(phy, ndat, k, discreteModelType)
 		} else if(aceType=="MCMC"){
 			zz<- getDiscreteAceMCMC(phy, ndat, k, discreteModelType)
+		} else if(aceType=="stochastic"){
+			zz<-getDiscreteAceStochastic(phy, ndat, k, discreteModelType)
 		}
 		
 		#if(plot) plotDiscreteReconstruction(phy, zz, dat, charStates)
-    
-		colnames(zz)<-charStates
+    	
+    	if(aceType != "stochastic") colnames(zz)<-charStates
 		return(zz)	
 			
 	} else if(ctype=="continuous") {
@@ -269,6 +272,27 @@ getDiscreteAceMCMC<-function(phy, ndat, k, discreteModelType) { # results do not
 	zz<-apply(aceSamp, 2, table)/1000
 	attributes(zz)$fit <- fit
 	t(zz)
+}
+
+getDiscreteAceStochastic<-function(phy, ndat, k, discreteModelType) {
+	
+	if(discreteModelType =="ER") extra="q" else extra=NULL
+
+	lik<-make.mkn(phy, ndat, k=k)
+	con<-makeMkConstraints(k=k, modelType= discreteModelType)
+	ltemp<-lik
+	
+	if(!is.null(con))
+		for(i in 1:length(con)) ltemp<-constrain(ltemp, con[[i]], extra=extra)
+	
+	lik<-ltemp
+	
+	pnames<-argnames(lik)
+	fit<-find.mle(lik, setNames(rep(1,length(pnames)), argnames(lik)))
+	
+	zz<-asr.stoch(lik, coef(fit))
+ 	attributes(zz)$fit <- fit
+	zz		
 }
 	
 
