@@ -7,11 +7,12 @@ Author: Luke Harmon, Eliot Miller and Josef Uyeda
 Maintainer: Josef Uyeda <josef.uyeda@gmail.com>
 Description: interface with Arbor Workflow software
 License: GPL-2 | GPL-3
-Imports:
+Depends:
     ape,
     diversitree,
-    geiger,
+    dplyr,
+    geiger
+Imports:
     picante,
     phytools,
-    dplyr,
     RColorBrewer
