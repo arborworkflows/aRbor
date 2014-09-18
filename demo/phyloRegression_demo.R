@@ -1,4 +1,4 @@
-library(ape)
+#library(ape)
 
 tree<-pbtree(n=100, scale=1)
 mm<-cbind(c(1, -0.5), c(-0.5, 1))

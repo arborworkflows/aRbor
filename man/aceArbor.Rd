@@ -23,6 +23,7 @@ aceArbor(td, charType = "continuous", aceType = "marginal",
         \item{"marginal"}{marginal ancestral state reconstructions, which reconstruct each node integrating over all possibilities at all other nodes in the tree; this is typically the method used in the literature to reconstruce ACEs}
         \item{"joint"}{joint ancestral reconstructions, which give the configuration of ancestral states that together maximize the likelihood of the data given model parameters}
         \item{"mcmc"}{reconstruct ancestral states using Bayesian MCMC. Note that the discrete version of this doesn't seem to work, and even if it did work it is not a full MCMC ancestral state method}
+        \item{"stochastic"}{create stochastic character map}
     }}
 
 \item{discreteModelType}{One of ER, SYM, or ARD; see geiger's fitDiscrete for full description}
