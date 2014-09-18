@@ -57,8 +57,8 @@ getBisseMk2<-function(phy, ndat) {
 	
 	#lik<-ltemp
 	
-	pnames<-argnames(lik)
-	fit<-find.mle(lik, setNames(rep(1,length(pnames)), argnames(lik)))
+	p<-starting.point.bisse(phy)
+	fit<-find.mle(lik, p, argnames(lik)))
 	
 	return(fit)	
 }
