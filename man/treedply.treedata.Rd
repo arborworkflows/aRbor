@@ -27,7 +27,7 @@ data(anolis)
 td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
 treedply(td, fitContinuous(phy, getVector(dat, SVL), model="BM", ncores=2))
 #treedply(td, fitContinuous(phy, select(dat, PCI_limbs, PCII_head,
-  PCIII_padwidth_vs_tail, PCIV_lamella_num), model="BM", ncores=2))
+  #PCIII_padwidth_vs_tail, PCIV_lamella_num), model="BM", ncores=2))
 
 require(phytools)
 treedply(td, phylosig(phy, getVector(dat, awesomeness), "lambda", test=TRUE))
