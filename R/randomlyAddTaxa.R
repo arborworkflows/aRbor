@@ -69,6 +69,7 @@
 #' crown <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="crown", noRandomTrees=10)
 #' stem <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="stem", noRandomTrees=10)
 #' polytomy <- randomlyAddTaxa(tree=bird.families, groupings=groupsDF, fromNode="polytomy", noRandomTrees=10)
+#' @export
 
 randomlyAddTaxa <- function(tree, groupings, fromNode, noRandomTrees, printToScreen=TRUE, saveToFile=FALSE)
 {

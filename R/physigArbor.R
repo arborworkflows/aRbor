@@ -1,6 +1,7 @@
 #' Function for calculating phylogenetic signal of discrete and continuous traits
 #' 
 #' This function allows testing either Blomberg (for continuous), Pagel lambda (for both), or "garbage test" (for discrete)
+#' @export
 
 physigArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
 	ctype = match.arg(charType, c("fromData", "discrete", "continuous"))

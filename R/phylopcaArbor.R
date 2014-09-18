@@ -1,6 +1,7 @@
 #' Carry out a phylogenetic PCA analysis
 #'
 #' @param td An object of class 'treedata'
+#' @export
 
 
 phylopcaArbor<-function(td) {

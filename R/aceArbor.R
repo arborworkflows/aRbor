@@ -19,6 +19,7 @@
 #'	}	
 #' @param discreteModelType One of ER, SYM, or ARD; see geiger's fitDiscrete for full description
 #' @param plot If true, make a plot of ancestral states.
+#' @export
 
 aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER", na.rm="bytrait") {
 	

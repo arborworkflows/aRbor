@@ -3,6 +3,7 @@
 #' This function tests for a relationship between a two-state character and speciation / extinction rates
 #'
 #' @param td An object of class 'treedata'
+#' @export
 
 bisseArbor<-function(td) {
 	

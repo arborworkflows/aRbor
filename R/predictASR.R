@@ -4,6 +4,8 @@
 #' @param prior Either "stationary" or "equal" 
 #' @param plot A logical indicating whether a plot should be produced
 #' @param pal A color palette to color the nodes
+#' @export
+
 validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.tip=0.5, cex.lab=1, cex.actual=5, pal=rainbow, label.offset=0.1,...){
   ntips <- length(attributes(asr)$td$phy$tip.label)
   nnodes <- attributes(asr)$td$phy$Nnode
