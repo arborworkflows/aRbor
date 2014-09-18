@@ -6,18 +6,6 @@
 physigArbor(phy, dat, charType = "fromData", signalTest = "pagelLambda",
   discreteModelType = "ER")
 }
-\arguments{
-\item{phy}{A tree of class 'phylo'}
-
-\item{dat}{A named vector of continuous or discrete data}
-
-\item{charType}{The type of data being analyzed. Defaults to "fromData" which detects
-data type, but may be forced to either "continuous" or "discrete"}
-
-\item{signalTest}{The type of test used to detect phylogenetic signal, either "pagelLambda", "Blomberg", or "garbageTest"}
-
-\item{discreteModelType}{The type of model used to fit discrete character evolution for the garbageTest, either "ER", "SYM", or "ARD"}
-}
 \description{
 This function allows testing either Blomberg (for continuous), Pagel lambda (for both), or "garbage test" (for discrete)
 }

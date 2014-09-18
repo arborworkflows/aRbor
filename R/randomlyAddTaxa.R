@@ -7,7 +7,7 @@
 #' @param tree An ape-style phylogenetic tree
 #' @param groupings A data frame with two columns, "species" and "group". Missing species,
 #' to be added, are taken as those that do not match a value in the tip labels of tree.
-#' @ fromNode Whether species should be added in a "polytomy" with, "crown" (more recently
+#' @param fromNode Whether species should be added in a "polytomy" with, "crown" (more recently
 #' diverged), "stem" (previously diverged), or "randomly" crown-wards or stem-wards from
 #' the tip they are bound to.
 #' @param noRandomTrees The number of desired final trees with all missing species from 
