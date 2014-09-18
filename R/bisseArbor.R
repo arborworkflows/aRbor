@@ -14,8 +14,8 @@ bisseArbor<-function(td) {
 	
 	class(res) <- c("asrArbor", class(res))
   	attributes(res)$td <- td
-  	attributes(res)$charType <- charType
-	attributes(res)$aceType <- aceType
+  	attributes(res)$charType <- "discrete"
+	attributes(res)$bisseType <- "Mk2"
     attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[,x]))
  
 	return(res)
@@ -46,7 +46,7 @@ bisseArborCalculator<-function(phy, dat, names=NULL) {
 
 getBisseMk2<-function(phy, ndat) {
 	
-	lik<-make.mk2(phy, ndat-1)
+	lik<-make.bisse(phy, ndat-1)
 	
 	#model type not supported yet
 	#con<-makeMkConstraints(k=k, modelType= discreteModelType)
@@ -58,7 +58,7 @@ getBisseMk2<-function(phy, ndat) {
 	#lik<-ltemp
 	
 	p<-starting.point.bisse(phy)
-	fit<-find.mle(lik, p, argnames(lik))
+	fit<-find.mle(lik, p)
 	
 	return(fit)	
 }
