@@ -9,9 +9,9 @@ Description: interface with Arbor Workflow software
 License: GPL-2 | GPL-3
 Depends:
     ape,
+    diversitree,
     geiger,
     picante,
-    diversitree,
     phytools,
     dplyr,
     RColorBrewer
