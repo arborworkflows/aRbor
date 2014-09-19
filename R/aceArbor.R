@@ -59,6 +59,8 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
   if(charType=="discrete"){
     attributes(res)$discreteModelType = discreteModelType
     attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[,x]))
+    attributes(res)$aceType <- aceType
+
   }
   if(any(is.na(td$dat))){
     attributes(res)$na.drop <- lapply(td$dat, function(x) rownames(td$dat)[which(is.na(x))])
@@ -181,7 +183,11 @@ plot.asrArbor <- function(asrArbor, ...){
     if("list" %in% class(asrArbor)){
       for(i in 1:length(asrArbor)){
         if(length(asrArbor) > 1) par(ask=TRUE)
-        plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), asrArbor[[i]], td$dat[!(rownames(td$dat) %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
+        if(attributes(asrArbor)$aceType=="stochastic") {
+        	plot(asrArbor[[1]], td$phy)
+        } else {
+        	plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), asrArbor[[i]], td$dat[!(rownames(td$dat) %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
+        }
       }
       par(ask=FALSE)
     } else {
