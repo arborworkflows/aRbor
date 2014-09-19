@@ -24,6 +24,6 @@ Function for plotting contrast values
 Phylogenetic independent contrasts are calculated at each node and plotted on the phylogeny,
 the value of of the absolute contrast is converted to a color scale. In addition, the relationship between
 node age and contrast value is plotted and a linear fit to the relationship between absolute contrast
-and the age of the node (The node-height test). Under BM the relationship should be 0,
+and the age of the node (The node-height test). Under BM the relationship should be 0.
 }
 

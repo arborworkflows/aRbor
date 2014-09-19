@@ -9,7 +9,9 @@
 #' @details Phylogenetic independent contrasts are calculated at each node and plotted on the phylogeny,
 #' the value of of the absolute contrast is converted to a color scale. In addition, the relationship between 
 #' node age and contrast value is plotted and a linear fit to the relationship between absolute contrast
-#' and the age of the node (The node-height test). Under BM the relationship should be 0, 
+#' and the age of the node (The node-height test). Under BM the relationship should be 0. 
+#' @export
+
 plotContrasts <- function(tree, dat, cex.tip.label = 0.5, label.offset=0.02, legend=TRUE, ...){
   tree$edge.length <- tree$edge.length/max(branching.times(tree))
   if(any(tree$edge.length==0)){
