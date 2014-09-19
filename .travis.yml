@@ -12,6 +12,7 @@ install:
   - ./travis-tool.sh aptget_install libgsl0-dev
   - ./travis-tool.sh install_deps
   - ./travis-tool.sh install_github richfitz/diversitree
+  - ./travis-tool.sh install_github mwpennell/geiger-v2
 
 script: ./travis-tool.sh run_tests
 
