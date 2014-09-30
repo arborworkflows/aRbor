@@ -16,6 +16,9 @@ make.treedata <- function(tree, data, name_column="detect") {
     data <- as.matrix(data)
     colnames(data) <- "trait"
   }
+  if(is.null(colnames(data))){
+    colnames(data) <- paste("trait", 1:ncol(data), sep="")
+  }
   coln <- colnames(data)
   if(name_column=="detect"){
     matches <- sapply(data.frame(rownames(data), data), function(x) sum(x %in% tree$tip.label))
