@@ -3,22 +3,58 @@
 #' This function allows testing either Blomberg (for continuous), Pagel lambda (for both), or "garbage test" (for discrete)
 #' @export
 
-physigArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
-	ctype = match.arg(charType, c("fromData", "discrete", "continuous"))
+physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
+	charType = match.arg(charType, c("fromData", "discrete", "continuous"))
 
-	if(ctype=="fromData") # then try to figure it out
-		ctype<-detectCharacterType(dat)
+	if(charType =="fromData") # then try to figure it out
+		charType <-detectCharacterType(td$dat)
+	
+	# check that the data actually make sense - this is a pretty weak test
+	if(charType=="continuous") {
+    td <- checkNumeric(td, return.numeric=TRUE)
+	}
+	if(charType=="discrete") {
+	  td <- checkFactor(td, return.factor=TRUE)
+	}
 	
 	signalTest = match.arg(signalTest, c("pagelLambda", "Blomberg", "garbageTest"))
 	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
 
-	missingSpecies<-is.na(dat)
-	if(sum(missingSpecies) > 0) {
-		dat<-dat[!missingSpecies]
-		phy<-drop.tip(phy, names(dat)[missingSpecies])
-	}
+	if(any(is.na(td$dat))){
+    	if(na.rm=="bytrait"){
+      		res <- lapply(1:ncol(td$dat), function(i) {
+        	tdi <- select(td, i);
+       		tdi <- filter(tdi, !is.na(tdi$dat[,1]));
+        	physigArborCalculator(tdi$phy, setNames(tdi$dat[,1], rownames(tdi$dat)), charType, signalTest, discreteModelType)
+      		})
+    	}
+    	if(na.rm=="all"){
+      		td <- filter(td, apply(apply(td$dat, 1, function(x) !is.na(x)), 2, all))
+      		res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, signalTest, discreteModelType))
+    	}
+  	} else {
+	  res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, signalTest, discreteModelType))
+  	}
+  	
+	class(res) <- c("physigArbor", class(res))
+  	attributes(res)$td <- td
+	attributes(res)$charType <- charType
+	attributes(res)$signalTest <- signalTest
+  	if(charType=="discrete"){
+    	attributes(res)$discreteModelType = discreteModelType
+    	attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[,x]))
+
+  	}
+  	if(any(is.na(td$dat))){
+    	attributes(res)$na.drop <- lapply(td$dat, function(x) rownames(td$dat)[which(is.na(x))])
+  	}
+	names(res) <- colnames(td$dat)
+	return(res)
+}
+
+physigArborCalculator<-function(phy, dat, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
 	
-	if(ctype=="discrete") {
+	if(charType =="discrete") {
 		# this changes the discrete data to 1:n and remembers the original charStates
 		dat<-as.factor(dat)
 		charStates<-levels(dat)
@@ -36,7 +72,7 @@ physigArbor<-function(phy, dat, charType="fromData", signalTest="pagelLambda", d
 		}
 	}
 	
-	if(ctype=="continuous") {
+	if(charType =="continuous") {
 		if(signalTest=="pagelLambda") {
 			res<-continuousLambdaTest(phy, dat)
 		} else if(signalTest=="garbageTest") {
@@ -131,6 +167,16 @@ continuousGarbageTest<-function(phy, dat) {
 }
 
 continuousBlombergTest<-function(phy, dat) {
-	res<-phylosignal(dat, phy)
+	pstest<-phylosignal(dat, phy)
+	bres<-list(k= pstest$K, vObs= pstest$PIC.variance.obs, vRnd=pstest$PIC.variance.rnd.mean, pVal=pstest$PIC.variance.P, zScore=pstest$PIC.variance.Z)
+	res<-list(lnlValues= NULL, chisqTestStat= NULL, chisqPVal= NULL, aiccScores= NULL, bres=bres)
 	return(res)
+}
+
+#' @export
+print.physigArbor <- function(x, ...){
+  names <- attributes(x)$names
+  attributes(x) <- NULL
+  attributes(x)$names <-  names
+  print(x)
 }
