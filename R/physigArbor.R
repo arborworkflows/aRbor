@@ -57,10 +57,13 @@ discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
 	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
 	
-	aicScores<-c(m1$opt$aicc, m2$opt$aicc)
-	names(aicScores)<-c("Mk", "Mk+lambda")
+	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
+	names(lnlValues)<-c("Lambda fixed at one", "Lambda estimated")
 	
-	res<-list(chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aicScores= aicScores)
+	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
+	names(aiccScores)<-c("Lambda fixed at one", "Lambda estimated")
+	
+	res<-list(lnlValues= lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores)
 	return(res)
 }
 
@@ -68,10 +71,14 @@ discreteGarbageTest<-function(phy, ndat, k, discreteModelType) {
 	m1<-fitDiscrete(phy, ndat, model=discreteModelType)
 	m2<-fitDiscreteGarbageModel(phy, ndat)
 	
+	lnlValues<-c(m1$opt$lnL, m2$lnL)
+	names(lnlValues)<-c("Mk", "Garbage")
+	
+	
 	aiccScores<-c(m1$opt$aicc, m2$aicc)
 	names(aiccScores)<-c("Mk", "Garbage")
 	
-	res<-list(aiccScores= aiccScores)
+	res<-list(lnlValues= lnlValues, chisqTestStat= NULL, chisqPVal= NULL, aiccScores= aiccScores)
 	return(res)
 }
 
@@ -92,13 +99,17 @@ continuousLambdaTest<-function(phy, dat) {
 	m1<-fitContinuous(phy, dat, model="BM")
 	m2<-fitContinuous(phy, dat, model="lambda")
 	
+	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
+	names(lnlValues)<-c("BM", "BM+lambda")
+	
+	
 	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
 	
-	aicScores<-c(m1$opt$aicc, m2$opt$aicc)
-	names(aicScores)<-c("BM", "BM+lambda")
+	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
+	names(aiccScores)<-c("BM", "BM+lambda")
 	
-	res<-list(chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aicScores= aicScores)
+	res<-list(lnlValues = lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores)
 	return(res)
 }
 
@@ -107,10 +118,15 @@ continuousGarbageTest<-function(phy, dat) {
 	m1<-fitContinuous(phy, dat)
 	m2<-fitContinuous(phy, dat, model="white")
 	
+	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
+	names(lnlValues)<-c("BM", "white-noise")
+	
+	
+	
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
 	names(aiccScores)<-c("Mk", "WhiteNoise")
 	
-	res<-list(aiccScores= aiccScores)
+	res<-list(lnlValues= lnlValues, chisqTestStat= NULL, chisqPVal= NULL, aiccScores= aiccScores)
 	return(res)
 }
 

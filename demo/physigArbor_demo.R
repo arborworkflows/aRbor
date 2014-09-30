@@ -11,7 +11,7 @@ y<-setNames(as.numeric(x),names(x))
 
 physigArbor(tree, y, charType="discrete")
 physigArbor(tree, y, charType="discrete", signalTest="garbageTest")
-physigArbor(tree, y, charType="discrete", signalTest="Blomberg")
+#physigArbor(tree, y, charType="discrete", signalTest="Blomberg") # would return error
 
 z<-sim.char(tree, 1, model="BM")[,,1]
 physigArbor(tree, z, charType="continuous")
