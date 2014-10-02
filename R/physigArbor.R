@@ -11,10 +11,10 @@ physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discret
 	
 	# check that the data actually make sense - this is a pretty weak test
 	if(charType=="continuous") {
-    td <- checkNumeric(td, return.numeric=TRUE)
+    	td <- checkNumeric(td, return.numeric=TRUE)
 	}
 	if(charType=="discrete") {
-	  td <- checkFactor(td, return.factor=TRUE)
+		td <- checkFactor(td, return.factor=TRUE)
 	}
 	
 	signalTest = match.arg(signalTest, c("pagelLambda", "Blomberg", "garbageTest"))
