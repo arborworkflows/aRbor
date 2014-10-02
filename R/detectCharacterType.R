@@ -1,7 +1,7 @@
-detectCharacterType<-function(dat) {
+detectCharacterType<-function(dat, cutoff=0.1) {
 	if(is.factor(dat)) {
 			charType<-"discrete"
-	} else if(nlevels(as.factor(dat))/length(dat) < 0.1) {
+	} else if(nlevels(as.factor(dat))/length(dat) < cutoff) {
 			warning("Guessing that this is a discrete character based on repeated values")
 			charType<-"discrete"
 	} else {
