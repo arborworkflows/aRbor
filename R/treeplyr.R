@@ -28,7 +28,7 @@ make.treedata <- function(tree, data, name_column="detect") {
   if(name_column==0){
     dat.label <- rownames(data)
   } 
-  dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(apply(data[,x], 1, as.character)))))
+  dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(apply(data[,x, drop=FALSE], 1, as.character)))))
   #dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(as.character(data[,x])))))
   #dat <- data
   colnames(dat) <- coln
@@ -81,7 +81,7 @@ select.treedata <- function(tdObject, ...){
 
 #' @export
 filter.treedata <- function(tdObject, ...){
-  if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for filtering")
+  #if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for filtering")
   tdObject$dat <- mutate(tdObject$dat, tip.label=attributes(tdObject)$tip.label)
   tdObject$dat <- filter(tdObject$dat, ...)
   attributes(tdObject)$tip.label <- tdObject$dat$tip.label
@@ -358,12 +358,6 @@ mutate_.treedata <- function(tdObject, ..., .dots){
 }
 
 #' @export
-filter_.treedata <- function(tdObject, ..., .dots){
-  dots <- lazyeval::all_dots(.dots, ..., all_named=TRUE)
-  dat <- dplyr:::filter_impl(tdObject$dat, dots)
-  row.names(dat) <- attributes(tdObject)$tip.label
-  tdObject$dat <- dat
-  return(tdObject)
-}
+filter_.treedata <- filter.treedata
 
 
