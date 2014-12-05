@@ -13,12 +13,12 @@ test_that("treedata can handle matrix/dataframe input", {
   td_treeply <- treeply(td, rescale, model="OU", 10)
   
   ##Make sure that names don't get mixed up from original data
-  expect_identical(td$dat[anolis$phy$tip.label[jacknife],"SVL"], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
-  expect_identical(td_filtered$dat[,"SVL"], originaldat[td_filtered$phy$tip.label, "SVL"])
-  expect_identical(td_selected$dat[anolis$phy$tip.label[jacknife],"SVL"], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
-  expect_identical(td_mutated$dat[anolis$phy$tip.label[jacknife],"SVL"], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
-  expect_identical(td_reorder$dat[anolis$phy$tip.label[jacknife],"SVL"], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
-  expect_identical(td_treeply$dat[anolis$phy$tip.label[jacknife],"SVL"], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
+  expect_identical(td$dat$SVL[match(anolis$phy$tip.label[jacknife], attributes(td)$tip.label)], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
+  expect_identical(td_filtered$dat$SVL, originaldat[td_filtered$phy$tip.label, "SVL"])
+  expect_identical(td_selected$dat$SVL[match(anolis$phy$tip.label[jacknife], attributes(td)$tip.label)], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
+  expect_identical(td_mutated$dat$SVL[match(anolis$phy$tip.label[jacknife], attributes(td)$tip.label)], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
+  expect_identical(td_reorder$dat$SVL[match(anolis$phy$tip.label[jacknife], attributes(td)$tip.label)], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
+  expect_identical(td_treeply$dat$SVL[match(anolis$phy$tip.label[jacknife], attributes(td)$tip.label)], originaldat[anolis$phy$tip.label[jacknife], "SVL"])
   
   ##Make sure that filter works right
   expect_true(min(filter(td, SVL > 3.5)$dat$SVL) > 3.5)

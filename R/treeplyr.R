@@ -148,7 +148,7 @@ treeply.treedata <- function(tdObject, FUN, ...){
   out_FUN <- FUN(tdObject$phy, ...)
   if(class(out_FUN)[1] == "phylo"){
     tdObject$phy <- out_FUN
-    tdObject$dat <- tdObject$dat[tdObject$phy$tip.label,]
+    tdObject$dat <- tdObject$dat[match(tdObject$phy$tip.label, attributes(tdObject)$tip.label),]
     attributes(tdObject)$tip.label <- tdObject$phy$tip.label
     return(tdObject)
   } else {
@@ -358,6 +358,18 @@ mutate_.treedata <- function(tdObject, ..., .dots){
 }
 
 #' @export
-filter_.treedata <- filter.treedata
+filter_.treedata <- function(tdObject, ..., .dots){
+  dots <- lazyeval::all_dots(.dots, ..., all_named=TRUE)
+  tdObject$dat <- mutate(tdObject$dat, tip.label=attributes(tdObject)$tip.label)
+  dat <- dplyr:::filter_impl(tdObject$dat, dots)
+  tdObject$dat <- dat
+  attributes(tdObject)$tip.label <- tdObject$dat$tip.label
+  tdObject$dat <- select(tdObject$dat, 1:(ncol(tdObject$dat)-1))
+  tdObject$phy <- drop.tip(tdObject$phy, tdObject$phy$tip.label[!(tdObject$phy$tip.label %in% attributes(tdObject)$tip.label)])
+  return(tdObject)
+}
+
+
+
 
 
