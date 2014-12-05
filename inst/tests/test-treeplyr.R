@@ -22,7 +22,7 @@ test_that("treedata can handle matrix/dataframe input", {
   
   ##Make sure that filter works right
   expect_true(min(filter(td, SVL > 3.5)$dat$SVL) > 3.5)
-  expect_identical(td_filtered$phy$tip.label, rownames(td_filtered$dat))
+  expect_identical(td_filtered$phy$tip.label, td_filtered$phy$tip.label[as.numeric(rownames(td_filtered$dat))])
   ##Make sure that treeply applies the function correctly
   expect_identical(td_treeply$phy$edge.length, rescale(td$phy, "OU", 10)$edge.length)  
 
