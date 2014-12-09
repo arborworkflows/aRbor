@@ -43,13 +43,18 @@ make.treedata <- function(tree, data, name_column="detect") {
       clnm <- colnames(dat)[-which(colnames(dat)==name_column)]
     }
     dat <- dat[, clnm, drop=FALSE]
-    dat.label <- as.character(data[,name_column])
+    dat.label <- as.character(data[[name_column]])
   }
   data_not_tree <- setdiff(dat.label, tree$tip.label)
   tree_not_data <- setdiff(tree$tip.label, dat.label)
   phy <- drop.tip(tree, tree_not_data)
   dat <- filter(dat, dat.label %in% phy$tip.label)
   dat.label <- dat.label[dat.label %in% phy$tip.label]
+  if(any(duplicated(dat.label))){
+    warning("Duplicated data in dataset, selecting first unique entry for each species")
+    dat <- filter(dat, !duplicated(dat.label))
+    dat.label <- dat.label[!duplicated(dat.label)]
+  }
   o <- match(dat.label, phy$tip.label)
   dat <- arrange(dat, o)
   td <- list(phy=phy, dat=dat)
