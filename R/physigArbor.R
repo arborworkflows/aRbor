@@ -3,11 +3,11 @@
 #' This function allows testing either Blomberg (for continuous), Pagel lambda (for both), or "garbage test" (for discrete)
 #' @export
 
-physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
+physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discreteModelType="ER", na.rm="bytrait") {
 	charType = match.arg(charType, c("fromData", "discrete", "continuous"))
 
 	if(charType =="fromData") # then try to figure it out
-		charType <-detectCharacterType(td$dat)
+		charType <-detectCharacterType(td$dat[[1]])
 	
 	# check that the data actually make sense - this is a pretty weak test
 	if(charType=="continuous") {
@@ -25,12 +25,12 @@ physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discret
       		res <- lapply(1:ncol(td$dat), function(i) {
         	tdi <- select(td, i);
        		tdi <- filter(tdi, !is.na(tdi$dat[,1]));
-        	physigArborCalculator(tdi$phy, setNames(tdi$dat[,1], rownames(tdi$dat)), charType, signalTest, discreteModelType)
+        	physigArborCalculator(tdi$phy, setNames(tdi$dat[[1]], attributes(tdi)$tip.label), charType, signalTest, discreteModelType)
       		})
     	}
     	if(na.rm=="all"){
       		td <- filter(td, apply(apply(td$dat, 1, function(x) !is.na(x)), 2, all))
-      		res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, signalTest, discreteModelType))
+      		res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, signalTest, discreteModelType))
     	}
   	} else {
 	  res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, signalTest, discreteModelType))
@@ -87,17 +87,18 @@ physigArborCalculator<-function(phy, dat, charType="fromData", signalTest="pagel
 }
 
 discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
-	m1<-fitDiscrete(phy, ndat, model=discreteModelType)
+	l0tree<-rescale(phy, "lambda", 0)
+	m1<-fitDiscrete(l0tree, ndat, model=discreteModelType)
 	m2<-fitDiscrete(phy, ndat, model=discreteModelType, transform="lambda")
 	
 	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
 	
 	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
-	names(lnlValues)<-c("Lambda fixed at one", "Lambda estimated")
+	names(lnlValues)<-c("Lambda fixed at zero", "Lambda estimated")
 	
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
-	names(aiccScores)<-c("Lambda fixed at one", "Lambda estimated")
+	names(aiccScores)<-c("Lambda fixed at zero", "Lambda estimated")
 	
 	res<-list(lnlValues= lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores)
 	return(res)
