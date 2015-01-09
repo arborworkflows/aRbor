@@ -143,7 +143,7 @@ continuousLambdaTest<-function(phy, dat) {
 	m2<-fitContinuous(phy, dat, model="lambda")
 	
 	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
-	names(lnlValues)<-c("BM", "BM+lambda")
+	names(lnlValues)<-c("Lambda fixed at zero", "Lambda estimated")
 	
 	lambdaValue<-m2$opt$lambda
 	
@@ -151,7 +151,8 @@ continuousLambdaTest<-function(phy, dat) {
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
 	
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
-	names(aiccScores)<-c("BM", "BM+lambda")
+	names(aiccScores)<-c("Lambda fixed at zero", "Lambda estimated")
+	
 	
 	res<-list(lnlValues = lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores, lambdaValue= lambdaValue)
 	return(res)
