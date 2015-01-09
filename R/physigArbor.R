@@ -100,7 +100,10 @@ discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
 	names(aiccScores)<-c("Lambda fixed at zero", "Lambda estimated")
 	
-	res<-list(lnlValues= lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores)
+	lambdaValue<-m2$opt$lambda
+
+	
+	res<-list(lnlValues= lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores, lambdaValue= lambdaValue)
 	return(res)
 }
 
@@ -133,12 +136,16 @@ fitDiscreteGarbageModel<-function(phy, ndat) {
 
 
 continuousLambdaTest<-function(phy, dat) {
-	m1<-fitContinuous(phy, dat, model="BM")
+	
+	l0tree<-rescale(phy, "lambda", 0)
+
+	m1<-fitContinuous(l0tree, dat, model="BM")
 	m2<-fitContinuous(phy, dat, model="lambda")
 	
 	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
 	names(lnlValues)<-c("BM", "BM+lambda")
 	
+	lambdaValue<-m2$opt$lambda
 	
 	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
@@ -146,7 +153,7 @@ continuousLambdaTest<-function(phy, dat) {
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
 	names(aiccScores)<-c("BM", "BM+lambda")
 	
-	res<-list(lnlValues = lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores)
+	res<-list(lnlValues = lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores, lambdaValue= lambdaValue)
 	return(res)
 }
 
