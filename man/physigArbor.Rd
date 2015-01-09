@@ -3,8 +3,8 @@
 \alias{physigArbor}
 \title{Function for calculating phylogenetic signal of discrete and continuous traits}
 \usage{
-physigArbor(phy, dat, charType = "fromData", signalTest = "pagelLambda",
-  discreteModelType = "ER")
+physigArbor(td, charType = "fromData", signalTest = "pagelLambda",
+  discreteModelType = "ER", na.rm = "bytrait")
 }
 \description{
 This function allows testing either Blomberg (for continuous), Pagel lambda (for both), or "garbage test" (for discrete)
