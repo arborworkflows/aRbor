@@ -42,15 +42,15 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
       res <- lapply(1:ncol(td$dat), function(i) {
         tdi <- select(td, i);
         tdi <- filter(tdi, !is.na(tdi$dat[,1]));
-        aceArborCalculator(tdi$phy, setNames(tdi$dat[,1], rownames(tdi$dat)), charType, aceType, discreteModelType)
+        aceArborCalculator(tdi$phy, setNames(tdi$dat[,1], attributes(tdi)$tip.label), charType, aceType, discreteModelType)
       })
     }
     if(na.rm=="all"){
       td <- filter(td, apply(apply(td$dat, 1, function(x) !is.na(x)), 2, all))
-      res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, aceType, discreteModelType))
+      res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, aceType, discreteModelType))
     }
   } else {
-	  res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, aceType, discreteModelType))
+	  res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, aceType, discreteModelType))
   }
   class(res) <- c("asrArbor", class(res))
   attributes(res)$td <- td
@@ -63,7 +63,7 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 
   }
   if(any(is.na(td$dat))){
-    attributes(res)$na.drop <- lapply(td$dat, function(x) rownames(td$dat)[which(is.na(x))])
+    attributes(res)$na.drop <- lapply(td$dat, function(x) attributes(td)$tip.label[which(is.na(x))])
   }
 	# Note discrete "joint" and "MCMC" return weird stuff and don't work
 	names(res) <- colnames(td$dat)
@@ -120,7 +120,7 @@ aceArborCalculator<-function(phy, dat, charType="continuous", aceType="marginal"
 			
 	} else if(ctype=="continuous") {
 		if(aceType=="marginal") {
-			zz<-fastAnc(phy, dat, CI=T)
+			zz<-fastAnc(phy, dat, CI=TRUE)
 			ancestralStates<-data.frame(lowerCI95 = zz$CI95[,1], estimate = zz$ace, upperCI95=zz$CI95[,2])
 			rownames(ancestralStates)<-names(zz$ace)
 			names(dat)<-phy$tip.label 
@@ -186,12 +186,12 @@ plot.asrArbor <- function(asrArbor, ...){
         if(attributes(asrArbor)$aceType=="stochastic") {
         	plot(asrArbor[[1]], td$phy)
         } else {
-        	plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), asrArbor[[i]], td$dat[!(rownames(td$dat) %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
+        	plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), asrArbor[[i]], td$dat[!(attributes(td)$tip.label %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
         }
       }
       par(ask=FALSE)
     } else {
-      plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[1]]), asrArbor, td$dat[!(rownames(td$dat) %in% na.drop[[1]])], charStates, colnames(td$dat)[i], ...)
+      plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[1]]), asrArbor, td$dat[!(attributes(td)$tip.label %in% na.drop[[1]])], charStates, colnames(td$dat)[i], ...)
     }
   }
   if(type=="continuous"){
@@ -202,7 +202,7 @@ plot.asrArbor <- function(asrArbor, ...){
       }
       par(ask=FALSE)
     } else {
-        plotContAce(td, colnames(td$dat)[1], asrArbor, ...)
+        plotContAce(td, colnames(td$dat)[1], asrArbor[[1]], ...)
     }
   }
 }
@@ -242,8 +242,8 @@ plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue"
   }
   get.index <- make.index(100, min(asr), max(asr))
   gb <- lapply(1:length(XX), function(i) errorpolygon(XX[i], YY[i], asr[i,1], asr[i,2], asr[i,3], pal=pal, indexfn=get.index, cex.asr=cex.asr, adj=adjp))
-  add.color.bar(0.5, pal(100), title = trait, lims <- c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
-  tiplabels(pch=21, bg=pal(100)[get.index(td$dat[,trait])], col=pal(100)[get.index(td$dat[,trait])] ,cex=2*cex.asr)
+  add.color.bar(0.5, pal(100), title = trait, lims = c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
+  tiplabels(pch=21, bg=pal(100)[get.index(td$dat[[trait]])], col=pal(100)[get.index(td$dat[[trait]])] ,cex=2*cex.asr)
 }
 
 
