@@ -242,7 +242,7 @@ plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue"
   }
   get.index <- make.index(100, min(asr), max(asr))
   gb <- lapply(1:length(XX), function(i) errorpolygon(XX[i], YY[i], asr[i,1], asr[i,2], asr[i,3], pal=pal, indexfn=get.index, cex.asr=cex.asr, adj=adjp))
-  add.color.bar(0.5, pal(100), title = trait, lims = c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
+  addColorBar(0.4*(max(XX)-min(XX)), pal(100), title = trait, lims = c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
   tiplabels(pch=21, bg=pal(100)[get.index(td$dat[[trait]])], col=pal(100)[get.index(td$dat[[trait]])] ,cex=2*cex.asr)
 }
 
@@ -306,6 +306,90 @@ getDiscreteAceStochastic<-function(phy, ndat, k, discreteModelType) {
 	zz		
 }
 	
+#' taken from phytools
+addColorBar <- function (leg, cols, title = NULL, lims = c(0, 1), digits = 1, 
+          prompt = TRUE, lwd = 4, outline = TRUE, ...) {
+  if (prompt) {
+    cat("Click where you want to draw the bar\n")
+    x <- unlist(locator(1))
+    y <- x[2]
+    x <- x[1]
+  }
+  else {
+    if (hasArg(x)) 
+      x <- list(...)$x
+    else x <- 0
+    if (hasArg(y)) 
+      y <- list(...)$y
+    else y <- 0
+  }
+  if (hasArg(fsize)) 
+    fsize <- list(...)$fsize
+  else fsize <- 1
+  if (hasArg(subtitle)) 
+    subtitle <- list(...)$subtitle
+  else subtitle <- NULL
+  X <- x + cbind(0:(length(cols) - 1)/length(cols), 1:length(cols)/length(cols)) * 
+    (leg)
+  Y <- cbind(rep(y, length(cols)), rep(y, length(cols)))
+  if (outline) 
+    lines(c(X[1, 1], X[nrow(X), 2]), c(Y[1, 1], Y[nrow(Y), 
+                                                  2]), lwd = lwd + 2, lend = 2)
+  for (i in 1:length(cols)) lines(X[i, ], Y[i, ], col = cols[i], 
+                                  lwd = lwd, lend = 2)
+  text(x = x, y = y, round(lims[1], digits), pos = 3, cex = fsize)
+  text(x = x + leg, y = y, round(lims[2], digits), pos = 3, 
+       cex = fsize)
+  if (is.null(title)) 
+    title <- "P(state=1)"
+  text(x = (2 * x + leg)/2, y = y, title, pos = 3, cex = fsize)
+  if (is.null(subtitle)) 
+    text(x = (2 * x + leg)/2, y = y, paste("length=", round(leg, 
+                                                            3), sep = ""), pos = 1, cex = fsize)
+  else text(x = (2 * x + leg)/2, y = y, subtitle, pos = 1, 
+            cex = fsize)
+}
 
-
-			
+#' Fastanc function from phytools
+fastAnc <- function (tree, x, vars = FALSE, CI = FALSE) {
+  if (!is.binary.tree(tree)) 
+    btree <- multi2di(tree)
+  else btree <- tree
+  M <- btree$Nnode
+  N <- length(btree$tip.label)
+  anc <- v <- vector()
+  for (i in 1:M + N) {
+    a <- multi2di(root(btree, node = i))
+    anc[i - N] <- ace(x, a, method = "pic")$ace[1]
+    names(anc)[i - N] <- i
+    if (vars || CI) {
+      picx <- pic(x, a, rescaled.tree = TRUE)
+      b <- picx$rescaled.tree
+      d <- which(b$edge[, 1] == (length(b$tip.label) + 
+                                   1))
+      v[i - N] <- (1/b$edge.length[d[1]] + 1/b$edge.length[d[2]])^(-1) * 
+        mean(picx$contr^2)
+      names(v)[i - N] <- names(anc)[i - N]
+    }
+  }
+  if (!is.binary.tree(tree)) {
+    ancNames <- matchNodes(tree, btree)
+    anc <- anc[as.character(ancNames[, 2])]
+    names(anc) <- ancNames[, 1]
+    if (vars || CI) {
+      v[as.character(ancNames[, 2])]
+      names(v) <- ancNames[, 1]
+    }
+  }
+  result <- list(ace = anc)
+  if (vars) 
+    result$var <- v
+  if (CI) {
+    result$CI95 <- cbind(anc - 1.96 * sqrt(v), anc + 1.96 * 
+                           sqrt(v))
+    rownames(result$CI95) <- names(anc)
+  }
+  if (length(result) == 1) 
+    return(result$ace)
+  else return(result)
+}			
