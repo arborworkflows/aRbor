@@ -15,4 +15,5 @@ Depends:
 Imports:
     picante,
     phytools,
-    RColorBrewer
+    RColorBrewer,
+    lazyeval

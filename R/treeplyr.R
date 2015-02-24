@@ -67,7 +67,7 @@ make.treedata <- function(tree, data, name_column="detect") {
 #' @export
 mutate.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]])) stop("No expressions provided to add to the treedata object")
-  dat <- dplyr:::mutate_impl(tdObject$dat, dplyr:::named_dots(...), environment())
+  dat <- mutate_impl.dplyr(tdObject$dat, named_dots.dplyr(...), environment())
   tdObject$dat <- dat
   rownames(tdObject$dat) <- attributes(tdObject)$tip.label
   return(tdObject)
@@ -77,7 +77,7 @@ mutate.treedata <- function(tdObject, ...){
 select.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for selection")
   vars <- select_vars(names(tdObject$dat), ..., env = parent.frame())
-  dat <- dplyr:::select_impl(tdObject$dat, vars)
+  dat <- select_impl.dplyr(tdObject$dat, vars)
   #dat <- lapply(dat, function(x){names(x) <- tdObject$dat[,1]; x})
   tdObject$dat <- dat
   rownames(tdObject$dat) <- attributes(tdObject)$tip.label
@@ -110,6 +110,22 @@ summarise.treedata <- function(tdObject, ...){
   return(res)
 }
 
+#' @rdname reorder.treedata
+#' @export
+reorder <- function(tdObject, ...){
+  UseMethod("reorder")
+}
+
+#' Reorder a 'treedata' object
+#' @description Reorders a 'treedata' object. Both the tips and the data are automatically reordered to match.
+#' @param tdObject An object of class 'treedata'
+#' @param order Method for reordering
+#' @param index.only XXX
+#' 
+#' @return An object of class 'treedata'
+#' 
+#' @examples
+#' x <- 10
 #' @export
 reorder.treedata <- function(tdObject, order="postorder", index.only=FALSE, ...){
   phy <- reorder(tdObject$phy, order, index.only)#, ...)
@@ -345,7 +361,7 @@ eval.string.dplyr = function(.data, .fun.name, ...) {
 
 #' @export
 select_.treedata <- function(tdObject, ..., .dots){
-  dots <- lazyeval::all_dots(.dots, ...)
+  dots <- all_dots(.dots, ...)
   vars <- select_vars_(names(tdObject$dat), dots)
   dat <- tdObject$dat[, vars, drop = FALSE]
   row.names(dat) <- attributes(tdObject)$tip.label
@@ -355,8 +371,8 @@ select_.treedata <- function(tdObject, ..., .dots){
 
 #' @export
 mutate_.treedata <- function(tdObject, ..., .dots){
-  dots <- lazyeval::all_dots(.dots, ..., all_named=TRUE)
-  dat <- dplyr:::mutate_impl(tdObject$dat, dots)
+  dots <- all_dots(.dots, ..., all_named=TRUE)
+  dat <- mutate_impl.dplyr(tdObject$dat, dots)
   row.names(dat) <- attributes(tdObject)$tip.label
   tdObject$dat <- dat
   return(tdObject)
@@ -364,9 +380,9 @@ mutate_.treedata <- function(tdObject, ..., .dots){
 
 #' @export
 filter_.treedata <- function(tdObject, ..., .dots){
-  dots <- lazyeval::all_dots(.dots, ..., all_named=TRUE)
+  dots <- all_dots(.dots, ..., all_named=TRUE)
   tdObject$dat <- mutate(tdObject$dat, tip.label=attributes(tdObject)$tip.label)
-  dat <- dplyr:::filter_impl(tdObject$dat, dots)
+  dat <- filter_impl.dplyr(tdObject$dat, dots)
   tdObject$dat <- dat
   attributes(tdObject)$tip.label <- tdObject$dat$tip.label
   tdObject$dat <- select(tdObject$dat, 1:(ncol(tdObject$dat)-1))
@@ -374,7 +390,28 @@ filter_.treedata <- function(tdObject, ..., .dots){
   return(tdObject)
 }
 
+#' @export
+select_impl.dplyr <- function (df, vars) 
+{
+    .Call("dplyr_select_impl", PACKAGE = "dplyr", df, vars)
+}
 
+#' @export
+filter_impl.dplyr <- function (df, dots) 
+{
+    .Call("dplyr_filter_impl", PACKAGE = "dplyr", df, dots)
+}
 
+#' @export
+mutate_impl.dplyr <- function (df, dots) 
+{
+    .Call("dplyr_mutate_impl", PACKAGE = "dplyr", df, dots)
+}
+
+#' @export
+named_dots.dplyr <- function (...) 
+{
+    auto_name(dots(...))
+}
 
 

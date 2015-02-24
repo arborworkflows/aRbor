@@ -7,4 +7,6 @@
 #' @author Josef Uyeda and Luke Harmon
 #' @name aRbor
 #' @import ape geiger picante diversitree phytools dplyr RColorBrewer
+#' @importFrom lazyeval all_dots
+
 NULL
