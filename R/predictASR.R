@@ -37,7 +37,7 @@ validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.ti
   if(prior=="stationary"){
     pis <- stationary.freqs(Q)
   }
-  probs <- sapply(1:ntips,function(x){X[x,] <- pis; .reRoot1(x, tree, X, Q)})
+  probs <- sapply(1:ntips,function(x){X[x,] <- pis; reRootMethod(x, tree, X, Q)})
   #probs <- t(probs)
   #dd <- barplot(probs, col = cols, horiz=TRUE, xlim=c(-0.4, 1))
   #points(rep(-0.05, ntips),dd, pch=22, bg=cols[states], col="transparent")
@@ -125,7 +125,7 @@ predictMissingTips <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5,
 
 #' Internal function for calculating the marginal ancestral state of a node using the rerooting method. Adapted from
 #' phytools. 
-.reRoot1 <- function (i, tree, x, Q, model) {
+reRootMethod <- function (i, tree, x, Q, model) {
   n <- length(tree$tip.label)
   yy <- x
   yy <- yy[tree$tip.label, ]
@@ -134,3 +134,129 @@ predictMissingTips <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5,
   res.i <- suppressWarnings(apeAce(tt, yy, model = model, fixedQ = Q)$lik.anc[1,])
   return(res.i)
 }
+
+#' Internal function for calculating the marginal ancestral state of a node using the rerooting method. Adapted from
+#' phytools. 
+apeAce <- function (tree, x, model, fixedQ = NULL, ...) 
+{
+  if (hasArg(output.liks)) 
+    output.liks <- list(...)$output.liks
+  else output.liks <- TRUE
+  ip <- 0.1
+  nb.tip <- length(tree$tip.label)
+  nb.node <- tree$Nnode
+  if (is.matrix(x)) {
+    x <- x[tree$tip.label, ]
+    nl <- ncol(x)
+    lvls <- colnames(x)
+  }
+  else {
+    x <- x[tree$tip.label]
+    if (!is.factor(x)) 
+      x <- factor(x)
+    nl <- nlevels(x)
+    lvls <- levels(x)
+    x <- as.integer(x)
+  }
+  if (is.null(fixedQ)) {
+    if (is.character(model)) {
+      rate <- matrix(NA, nl, nl)
+      if (model == "ER") 
+        np <- rate[] <- 1
+      if (model == "ARD") {
+        np <- nl * (nl - 1)
+        rate[col(rate) != row(rate)] <- 1:np
+      }
+      if (model == "SYM") {
+        np <- nl * (nl - 1)/2
+        sel <- col(rate) < row(rate)
+        rate[sel] <- 1:np
+        rate <- t(rate)
+        rate[sel] <- 1:np
+      }
+    }
+    else {
+      if (ncol(model) != nrow(model)) 
+        stop("the matrix given as 'model' is not square")
+      if (ncol(model) != nl) 
+        stop("the matrix 'model' must have as many rows as the number of categories in 'x'")
+      rate <- model
+      np <- max(rate)
+    }
+    Q <- matrix(0, nl, nl)
+  }
+  else {
+    rate <- matrix(NA, nl, nl)
+    np <- nl * (nl - 1)
+    rate[col(rate) != row(rate)] <- 1:np
+    Q <- fixedQ
+  }
+  index.matrix <- rate
+  tmp <- cbind(1:nl, 1:nl)
+  index.matrix[tmp] <- NA
+  rate[tmp] <- 0
+  rate[rate == 0] <- np + 1
+  liks <- matrix(0, nb.tip + nb.node, nl)
+  TIPS <- 1:nb.tip
+  if (is.matrix(x)) 
+    liks[TIPS, ] <- x
+  else liks[cbind(TIPS, x)] <- 1
+  phy <- reorder(tree, "pruningwise")
+  dev <- function(p, output.liks = FALSE, fixedQ = NULL) {
+    if (any(is.nan(p)) || any(is.infinite(p))) 
+      return(1e+50)
+    comp <- numeric(nb.tip + nb.node)
+    if (is.null(fixedQ)) {
+      Q[] <- c(p, 0)[rate]
+      diag(Q) <- -rowSums(Q)
+    }
+    else Q <- fixedQ
+    for (i in seq(from = 1, by = 2, length.out = nb.node)) {
+      j <- i + 1L
+      anc <- phy$edge[i, 1]
+      des1 <- phy$edge[i, 2]
+      des2 <- phy$edge[j, 2]
+      v.l <- matexpo(Q * phy$edge.length[i]) %*% liks[des1, 
+                                                      ]
+      v.r <- matexpo(Q * phy$edge.length[j]) %*% liks[des2, 
+                                                      ]
+      v <- v.l * v.r
+      comp[anc] <- sum(v)
+      liks[anc, ] <- v/comp[anc]
+    }
+    if (output.liks) 
+      return(liks[-TIPS, ])
+    dev <- -2 * sum(log(comp[-TIPS]))
+    if (is.na(dev)) 
+      Inf
+    else dev
+  }
+  if (is.null(fixedQ)) {
+    out <- nlminb(rep(ip, length.out = np), function(p) dev(p), 
+                  lower = rep(0, np), upper = rep(1e+50, np))
+    obj <- list()
+    obj$loglik <- -out$objective/2
+    obj$rates <- out$par
+    obj$index.matrix <- index.matrix
+    if (output.liks) {
+      obj$lik.anc <- dev(obj$rates, TRUE)
+      colnames(obj$lik.anc) <- lvls
+    }
+    obj$states <- lvls
+  }
+  else {
+    out <- dev(rep(ip, length.out = np), fixedQ = Q)
+    obj <- list()
+    obj$loglik <- -out/2
+    obj$rates <- fixedQ[sapply(1:np, function(x, y) which(x == 
+                                                            y), index.matrix)]
+    obj$index.matrix <- index.matrix
+    if (output.liks) {
+      obj$lik.anc <- dev(obj$rates, TRUE, fixedQ = Q)
+      colnames(obj$lik.anc) <- lvls
+    }
+    obj$states <- lvls
+  }
+  return(obj)
+}
+

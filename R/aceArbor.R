@@ -174,35 +174,35 @@ plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=
 }
 
 #' @export
-plot.asrArbor <- function(asrArbor, ...){
-  type <- attributes(asrArbor)$charType
-  td <- attributes(asrArbor)$td
-  na.drop <- attributes(asrArbor)$na.drop
+plot.asrArbor <- function(x, ...){
+  type <- attributes(x)$charType
+  td <- attributes(x)$td
+  na.drop <- attributes(x)$na.drop
   if(type=="discrete"){
-    charStates <- attributes(asrArbor)$charStates
-    if("list" %in% class(asrArbor)){
-      for(i in 1:length(asrArbor)){
-        if(length(asrArbor) > 1) par(ask=TRUE)
-        if(attributes(asrArbor)$aceType=="stochastic") {
-        	plot(asrArbor[[1]], td$phy)
+    charStates <- attributes(x)$charStates
+    if("list" %in% class(x)){
+      for(i in 1:length(x)){
+        if(length(x) > 1) par(ask=TRUE)
+        if(attributes(x)$aceType=="stochastic") {
+        	plot(x[[1]], td$phy)
         } else {
-        	plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), asrArbor[[i]], td$dat[!(attributes(td)$tip.label %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
+        	plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), x[[i]], td$dat[!(attributes(td)$tip.label %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
         }
       }
       par(ask=FALSE)
     } else {
-      plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[1]]), asrArbor, td$dat[!(attributes(td)$tip.label %in% na.drop[[1]])], charStates, colnames(td$dat)[i], ...)
+      plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[1]]), x, td$dat[!(attributes(td)$tip.label %in% na.drop[[1]])], charStates, colnames(td$dat)[i], ...)
     }
   }
   if(type=="continuous"){
-    if("list" %in% class(asrArbor)){
-      for(i in 1:length(asrArbor)){
-        if(length(asrArbor) > 1) par(ask=TRUE)
-        plotContAce(td, colnames(td$dat)[i], asrArbor[[i]],  ...)
+    if("list" %in% class(x)){
+      for(i in 1:length(x)){
+        if(length(x) > 1) par(ask=TRUE)
+        plotContAce(td, colnames(td$dat)[i], x[[i]],  ...)
       }
       par(ask=FALSE)
     } else {
-        plotContAce(td, colnames(td$dat)[1], asrArbor[[1]], ...)
+        plotContAce(td, colnames(td$dat)[1], x[[1]], ...)
     }
   }
 }

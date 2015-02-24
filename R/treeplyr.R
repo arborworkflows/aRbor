@@ -236,12 +236,12 @@ getVector <- function(dat, ...){
 }
 
 #' @export
-print.treedata <- function(tdObject, ...){
+print.treedata <- function(x, ...){
   cat("$phy \n")
-  print(tdObject$phy)
+  print(x$phy)
   
   cat("\n$data \n")
-  print(tdObject$dat)
+  print(x$dat)
 }
 
 #' @export
@@ -360,34 +360,34 @@ eval.string.dplyr = function(.data, .fun.name, ...) {
 }
 
 #' @export
-select_.treedata <- function(tdObject, ..., .dots){
+select_.treedata <- function(.data, ..., .dots){
   dots <- all_dots(.dots, ...)
-  vars <- select_vars_(names(tdObject$dat), dots)
-  dat <- tdObject$dat[, vars, drop = FALSE]
-  row.names(dat) <- attributes(tdObject)$tip.label
-  tdObject$dat <- dat
-  return(tdObject)
+  vars <- select_vars_(names(.data$dat), dots)
+  dat <- .data$dat[, vars, drop = FALSE]
+  row.names(dat) <- attributes(.data)$tip.label
+  .data$dat <- dat
+  return(.data)
 }
 
 #' @export
-mutate_.treedata <- function(tdObject, ..., .dots){
+mutate_.treedata <- function(.data, ..., .dots){
   dots <- all_dots(.dots, ..., all_named=TRUE)
-  dat <- mutate_impl.dplyr(tdObject$dat, dots)
-  row.names(dat) <- attributes(tdObject)$tip.label
-  tdObject$dat <- dat
-  return(tdObject)
+  dat <- mutate_impl.dplyr(.data$dat, dots)
+  row.names(dat) <- attributes(.data)$tip.label
+  .data$dat <- dat
+  return(.data)
 }
 
 #' @export
-filter_.treedata <- function(tdObject, ..., .dots){
+filter_.treedata <- function(.data, ..., .dots){
   dots <- all_dots(.dots, ..., all_named=TRUE)
-  tdObject$dat <- mutate(tdObject$dat, tip.label=attributes(tdObject)$tip.label)
-  dat <- filter_impl.dplyr(tdObject$dat, dots)
+  tdObject$dat <- mutate(.data$dat, tip.label=attributes(.data)$tip.label)
+  dat <- filter_impl.dplyr(.data$dat, dots)
   tdObject$dat <- dat
-  attributes(tdObject)$tip.label <- tdObject$dat$tip.label
-  tdObject$dat <- select(tdObject$dat, 1:(ncol(tdObject$dat)-1))
-  tdObject$phy <- drop.tip(tdObject$phy, tdObject$phy$tip.label[!(tdObject$phy$tip.label %in% attributes(tdObject)$tip.label)])
-  return(tdObject)
+  attributes(.data)$tip.label <- .data$dat$tip.label
+  .data$dat <- select(.data$dat, 1:(ncol(.data$dat)-1))
+  .data$phy <- drop.tip(.data$phy, .data$phy$tip.label[!(.data$phy$tip.label %in% attributes(.data)$tip.label)])
+  return(.data)
 }
 
 #' @export
