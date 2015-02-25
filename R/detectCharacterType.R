@@ -1,3 +1,12 @@
+#' Function to detect whether a character is continuous or discrete
+#' 
+#' @param dat A vector of data 
+#' @param cutoff Cutoff value for deciding if numeric data might actually be descrete: if nlev is the number of levels and n the length of dat, then nlev / n should exceed cutoff, or the data will be classified as discrete
+#' @return Either "discrete" or "continuous" 
+#' @examples
+#' data(anolis)
+#' detectCharacterType(anolis$dat[,1])
+#' @export
 detectCharacterType<-function(dat, cutoff=0.1) {
 	if(is.factor(dat)) {
 			charType<-"discrete"
@@ -10,7 +19,19 @@ detectCharacterType<-function(dat, cutoff=0.1) {
 	return(charType)
 }		# needless to say, this is not yet robust
 
-# Row and column name check and force
+#' Row and column name check
+#' 
+#' @param dat A vector of data 
+#' @param nameType, either:
+#' \describe{
+#'     \item{"row"}{Rows}
+#'   	 \item{"col"}{Columns}	
+#' 		 \item{"rowcol"}{Both rows and columns}
+#'	}
+#' @examples
+#' data(anolis)
+#' hasNames(anolis$dat, "row")
+#' @export
 hasNames <- function(dat, nameType="row") {
 	nType = match.arg(nameType, c("row", "col", "rowcol"))
 	if(nType=="row") {
@@ -26,6 +47,19 @@ hasNames <- function(dat, nameType="row") {
 	res
 }
 
+#' Force names for rows, columns, or both
+#' 
+#' @param dat A vector of data 
+#' @param nameType, either:
+#' \describe{
+#'     \item{"row"}{Rows}
+#' 		 \item{"col"}{Columns}	
+#' 		 \item{"rowcol"}{Both rows and columns}
+#'	}
+#' @examples
+#' data(anolis)
+#' forceNames(anolis$dat, "row")
+#' @export
 forceNames <- function(dat, nameType="row") {
 	nType = match.arg(nameType, c("row", "col", "rowcol"))
 	if(nType=="row" | nType=="rowcol") {

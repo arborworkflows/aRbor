@@ -6,7 +6,7 @@
 #' @docType package
 #' @author Josef Uyeda and Luke Harmon
 #' @name aRbor
-#' @import ape geiger picante diversitree phytools dplyr RColorBrewer
+#' @import ape geiger picante diversitree phytools dplyr RColorBrewer nlme
 #' @importFrom lazyeval all_dots
 
 NULL

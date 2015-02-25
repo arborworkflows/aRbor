@@ -165,7 +165,7 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	zz		
 }
 
-#' @export
+
 plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=1, cex.asr=0.5, ...) {
 	plot(phy, cex=cex, ...)
 	nodelabels(pie=zz, piecol=pal(length(charStates)), cex=cex.asr, frame="circle")
@@ -173,6 +173,18 @@ plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=
 	legend("bottomleft", fill=pal(length(charStates)), legend=charStates)
 }
 
+#' Plot ancestral state reconstruction
+#'
+#' This function plots the output of aceArbor 
+#'
+#' @param x The output of aceArbor
+#' @param ... Other arguments to plot, including:
+#' \describe{
+#'     \item{"charStates"}{Vector with names for character state levels (discrete only)}
+#'     \item{"pal"}{Color pallette}	
+#'     \item{"cex"}{Scaling for tip labels}
+#'     \item{"cex.asr"}{Scaling for pie charts}
+#'	}
 #' @export
 plot.asrArbor <- function(x, ...){
   type <- attributes(x)$charType
@@ -207,6 +219,12 @@ plot.asrArbor <- function(x, ...){
   }
 }
 
+#' Print results from ancestral state reconstruction
+#'
+#' This function prints the output of aceArbor 
+#'
+#' @param x The output of aceArbor
+#' @param ... Other arguments (ignored for now)
 #' @export
 print.asrArbor <- function(x, ...){
   names <- attributes(x)$names
@@ -215,7 +233,6 @@ print.asrArbor <- function(x, ...){
   print(x)
 }
 
-#' @export
 plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue", "lightblue", "green", "yellow", "red")), n=100, adjp=c(0.5,0.5), cex.asr=1, cex=1, ...){
   plot(td$phy, cex=cex, ...)
   lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
