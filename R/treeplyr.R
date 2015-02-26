@@ -64,6 +64,16 @@ make.treedata <- function(tree, data, name_column="detect") {
   return(td)
 }
 
+#' Function for mutating an object of class 'treedata'
+#' 
+#' This function can be used to add new variables to a treedata object; see \code{\link{mutate}}.
+#' 
+#' @param tdObject A "\code{treedata}" object
+#' @return An object of class "\code{treedata}" with new data added. 
+#' @examples
+#' data(anolis)
+#' td <- make.treedata(anolis$phy, anolis$dat[,-(3:5)], name_column=1)
+#' tdmutate <- mutate(td, anolis$dat[,3])
 #' @export
 mutate.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]])) stop("No expressions provided to add to the treedata object")
@@ -73,6 +83,16 @@ mutate.treedata <- function(tdObject, ...){
   return(tdObject)
 }
 
+#' Function for selecting columns from an object of class 'treedata'
+#' 
+#' This function can be used to select a subset of variables (columns) from a treedata object; see \code{\link{select}}.
+#' 
+#' @param tdObject A "\code{treedata}" object
+#' @return An object of class "\code{treedata}" with specified variables selected. 
+#' @examples
+#' data(anolis)
+#' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+#' tdselect <- select(td, SVL)
 #' @export
 select.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for selection")
@@ -84,6 +104,16 @@ select.treedata <- function(tdObject, ...){
   return(tdObject)
 }
 
+#' Function for filtering rows from an object of class 'treedata'
+#' 
+#' This function can be used to select a subset of species (rows) from a treedata object; see \code{\link{filter}}.
+#' 
+#' @param tdObject A "\code{treedata}" object
+#' @return An object of class "\code{treedata}" with specified species selected. 
+#' @examples
+#' data(anolis)
+#' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+#' tdfilter <- filter(td, island=="Cuba")
 #' @export
 filter.treedata <- function(tdObject, ...){
   #if(is.null(list(substitute(...))[[1]]))  stop("No criteria provided for filtering")
@@ -96,6 +126,18 @@ filter.treedata <- function(tdObject, ...){
   return(tdObject)
 }
 
+#' @name summarise
+#' @aliases summarize
+#' Function for summarizing an object of class 'treedata'
+#' 
+#' This function can be used to summarize a treedata object.
+#' 
+#' @param tdObject A "\code{treedata}" object
+#' @return A summary of the treedata object 
+#' @examples
+#' data(anolis)
+#' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+#' summarize(td)
 #' @export
 summarize.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]]))  stop("No expression provided to summarize data")
@@ -244,6 +286,18 @@ print.treedata <- function(x, ...){
   print(x$dat)
 }
 
+
+#' Function for checking whether a treedata object contains only numeric columns and for forcing data columns into numeric format
+#' 
+#' This function can be used to check if a treedata object contains numeric columns and, if desired, drop all non-numeric columns.
+#' 
+#' @param tdObject A "\code{treedata}" object
+#' @param return.numeric If TRUE, then a treedata object with all numeric columns will be returned; non-numeric columns will be removed.
+#' @return If return.numeric, then an object of class "\code{treedata}" with only numeric columns. 
+#' @examples
+#' data(anolis)
+#' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+#' tdnumeric <- checkNumeric(td)
 #' @export
 checkNumeric <- function(tdObject, return.numeric=TRUE) {
   valid <- which(sapply(tdObject$dat, is.numeric))
@@ -251,7 +305,7 @@ checkNumeric <- function(tdObject, return.numeric=TRUE) {
     if(length(valid)==0){
       stop("Dataset does not contain any numeric data that can be used for continuous ancestral state reconstruction") }
     else {
-      not.valid <- colnames(tdObject$dat)[which(sapply(tdObject$dat, is.numeric))]
+      not.valid <- colnames(tdObject$dat)[which(!sapply(tdObject$dat, is.numeric))]
       warning(paste("Not all data continuous, dropping non-numeric data columns:", paste(not.valid, collapse=" ")))
       tdObject <- select(tdObject, valid)
     }
@@ -263,6 +317,17 @@ checkNumeric <- function(tdObject, return.numeric=TRUE) {
   }
 }
 
+#' Function for checking whether a treedata object contains only factors and for forcing data columns into factor format
+#' 
+#' This function can be used to check if a treedata object contains factors and, if desired, convert all columns automatically to factors.
+#' 
+#' @param tdObject A "\code{treedata}" object
+#' @param return.factor If TRUE, then a treedata object with all factors will be returned; columns will be forced into factors using \code{factor} and any with no repeated elements will be removed.
+#' @return If return.factor, then an object of class "\code{treedata}" with all columns as factors. 
+#' @examples
+#' data(anolis)
+#' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
+#' tdforcefactor <- checkFactor(td)
 #' @export
 checkFactor <- function(tdObject, return.factor=TRUE) {
   classes <- sapply(tdObject$dat, class)
