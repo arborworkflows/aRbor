@@ -127,8 +127,8 @@ filter.treedata <- function(tdObject, ...){
 }
 
 #' @name summarise
-#' @aliases summarize
-#' Function for summarizing an object of class 'treedata'
+#' @aliases summarize summarize.treedata summarise.treedata
+#' @title Function for summarizing an object of class 'treedata'
 #' 
 #' This function can be used to summarize a treedata object.
 #' 
@@ -446,9 +446,9 @@ mutate_.treedata <- function(.data, ..., .dots){
 #' @export
 filter_.treedata <- function(.data, ..., .dots){
   dots <- all_dots(.dots, ..., all_named=TRUE)
-  tdObject$dat <- mutate(.data$dat, tip.label=attributes(.data)$tip.label)
+  .data$dat <- mutate(.data$dat, tip.label=attributes(.data)$tip.label)
   dat <- filter_impl.dplyr(.data$dat, dots)
-  tdObject$dat <- dat
+  .data$dat <- dat
   attributes(.data)$tip.label <- .data$dat$tip.label
   .data$dat <- select(.data$dat, 1:(ncol(.data$dat)-1))
   .data$phy <- drop.tip(.data$phy, .data$phy$tip.label[!(.data$phy$tip.label %in% attributes(.data)$tip.label)])
