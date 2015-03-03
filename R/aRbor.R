@@ -8,5 +8,4 @@
 #' @name aRbor
 #' @import ape geiger picante diversitree phytools dplyr RColorBrewer nlme
 #' @importFrom lazyeval all_dots
-
 NULL

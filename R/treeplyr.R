@@ -77,7 +77,7 @@ make.treedata <- function(tree, data, name_column="detect") {
 #' @export
 mutate.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]])) stop("No expressions provided to add to the treedata object")
-  dat <- mutate_impl.dplyr(tdObject$dat, named_dots.dplyr(...), environment())
+  dat <- mutate_impl.dplyr(tdObject$dat, named_dots.dplyr(...))
   tdObject$dat <- dat
   rownames(tdObject$dat) <- attributes(tdObject)$tip.label
   return(tdObject)
@@ -467,28 +467,50 @@ filter_.treedata <- function(.data, ..., .dots){
   return(.data)
 }
 
-#' @export
 select_impl.dplyr <- function (df, vars) 
 {
     .Call("dplyr_select_impl", PACKAGE = "dplyr", df, vars)
 }
 
-#' @export
 filter_impl.dplyr <- function (df, dots) 
 {
     .Call("dplyr_filter_impl", PACKAGE = "dplyr", df, dots)
 }
 
-#' @export
 mutate_impl.dplyr <- function (df, dots) 
 {
     .Call("dplyr_mutate_impl", PACKAGE = "dplyr", df, dots)
 }
 
-#' @export
 named_dots.dplyr <- function (...) 
 {
-    auto_name(dots(...))
+    auto_name(dots.dplyr(...))
 }
 
+dots.dplyr <- function (...) 
+{
+  eval(substitute(alist(...)))
+}
 
+auto_name.dplyr <- function (x) 
+{
+  names(x) <- auto_names.dplyr(x)
+  x
+}
+
+auto_names.dplyr <- function (x) 
+{
+  nms <- names2.dplyr(x)
+  missing <- nms == ""
+  if (all(!missing)) 
+    return(nms)
+  deparse2 <- function(x) paste(deparse(x, 500L), collapse = "")
+  defaults <- vapply(x[missing], deparse2, character(1), USE.NAMES = FALSE)
+  nms[missing] <- defaults
+  nms
+}
+
+names2.dplyr <- function (x) 
+{
+  names(x) %||% rep("", length(x))
+}
