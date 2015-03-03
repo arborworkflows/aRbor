@@ -101,7 +101,7 @@ predictMissingTips <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5,
     pis <- rep(1/k, k)
   }
   if(prior=="stationary"){
-    pis <- stationary.freqs(Q)
+    pis <- statdist.phytools(Q)
   }
   X[,missing] <- pis 
   X <- t(X)
@@ -260,3 +260,21 @@ apeAce <- function (tree, x, model, fixedQ = NULL, ...)
   return(obj)
 }
 
+statdist.phytools <- function (Q) 
+{
+  foo <- function(theta, Q) {
+    Pi <- c(theta[1:(nrow(Q) - 1)], 1 - sum(theta[1:(nrow(Q) - 
+                                                       1)]))
+    sum((Pi %*% Q)^2)
+  }
+  k <- nrow(Q)
+  if (nrow(Q) > 2) {
+    fit <- optim(rep(1/k, k - 1), foo, Q = Q, control = list(reltol = 1e-16))
+    return(setNames(c(fit$par[1:(k - 1)], 1 - sum(fit$par[1:(k - 
+                                                               1)])), rownames(Q)))
+  }
+  else {
+    fit <- optimize(foo, interval = c(0, 1), Q = Q)
+    return(setNames(c(fit$minimum, 1 - fit$minimum), rownames(Q)))
+  }
+}
