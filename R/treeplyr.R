@@ -199,8 +199,6 @@ reorder.treedata <- function(tdObject, order="postorder", index.only=FALSE, ...)
 }
 
 #' @rdname treeply.treedata
-#' @param tdObject A treedata object
-#' @param ... Additional arguments
 #' @export
 treeply <- function(tdObject, ...){
   UseMethod("treeply")
@@ -210,7 +208,8 @@ treeply <- function(tdObject, ...){
 #' @description Applies a function to the phylogeny in a 'treedata' object. If the order of tips are changed, or if tips are dropped, then the data are automatically reordered to match the tree.
 #' @param tdObject An object of class 'treedata'
 #' @param FUN A function that operates on an object of class 'phylo'
-#' 
+#' @param ... Additional arguments
+
 #' @return An object of class 'treedata'
 #' 
 #' @examples
