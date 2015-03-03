@@ -1,7 +1,6 @@
 #' Test for an evolutionary correlation between two continuous characters
 #'
 #' @param td An object of class 'treedata'
-#' @param colID A column selector for the dataframe in td
 #' @export
 continuousCorrelation<-function(td) {
 	

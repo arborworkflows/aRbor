@@ -15,11 +15,15 @@ predictMissingTips(asr, prior = "stationary", plot = TRUE, cex.node = 0.5,
 
 \item{cex.node}{Character expansion vector for the node pie charts}
 
+\item{cex.tip}{Character expansion vector for the tip pie charts}
+
 \item{cex.lab}{Character expansion vector for the tip labels}
 
 \item{pal}{A color palette to color the nodes}
 
-\item{cex.tips}{Character expansion vector for the tip pie charts}
+\item{label.offset}{How far to offset tip labels}
+
+\item{...}{Additional arguments to plot.phylo}
 }
 \description{
 A function to predict the states of missing tips

@@ -4,6 +4,7 @@
 #' @param dat A named vector of continuous phenotypic data
 #' @param cex.tip.label The character expansion factor for tip labels
 #' @param label.offset The relative amount the tip labels are offset from the tips of the tree
+#' @param legend Show legend or not?
 #' @param ... Additional arguments passed to plot.phylo
 #' 
 #' @details Phylogenetic independent contrasts are calculated at each node and plotted on the phylogeny,

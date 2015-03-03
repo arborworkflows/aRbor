@@ -1,8 +1,31 @@
-#' Function for calculating phylogenetic signal of discrete and continuous traits
+#' Function for measuring phylogenetic signal in comparative data
 #' 
-#' This function allows testing either Blomberg (for continuous), Pagel lambda (for both), or "garbage test" (for discrete)
+#' @param td A "\code{treedata}" object
+#' @param charType The type of data, one of:
+#' \describe{
+#'     \item{"continuous"}{Continuous}
+#'   	 \item{"discrete"}{Discrete (Categorical)}	
+#' 		 \item{"fromData"}{Try to tell from data: see \code{detectCharacterType}}
+#'	}
+#'  @param signalTest The test to carry out. Options are
+#'  \describe{
+#'     \item{"pagelLambda"}{Pagel's Lambda test}
+#'     \item{"Blomberg"}{Blomberg's K}
+#'     \item{"garbageTest"}{Garbage test (untested)}
+#'  }
+#'  @param discreteModelType Describes the discrete model. Options are
+#'  \describe{
+#'     \item{"ER"}{Equal rates}
+#'     \item{"SYM"}{Symmetric}
+#'     \item{"ARD"}{All rates different}
+#'  }
+#' @param na.rm How to deal with missing data.
+#' \describe{
+#'     \item{"bytrait"}{Drop species out trait-by-trait}
+#' 		\item{"all"}{Drop out species that have NAs for any trait}	
+#'	}	
+#' @return An object of class physigArbor. 
 #' @export
-
 physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discreteModelType="ER", na.rm="bytrait") {
 	charType = match.arg(charType, c("fromData", "discrete", "continuous"))
 

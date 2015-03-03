@@ -9,9 +9,13 @@ treeply(tdObject, ...)
 \method{treeply}{treedata}(tdObject, FUN, ...)
 }
 \arguments{
-\item{tdObject}{An object of class 'treedata'}
+\item{tdObject}{A treedata object}
+
+\item{...}{Additional arguments}
 
 \item{FUN}{A function that operates on an object of class 'phylo'}
+
+\item{tdObject}{An object of class 'treedata'}
 }
 \value{
 An object of class 'treedata'

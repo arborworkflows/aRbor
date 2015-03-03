@@ -5,6 +5,11 @@
 \usage{
 s_mutate(.data, ...)
 }
+\arguments{
+\item{.data}{dplyr object}
+
+\item{...}{Additional arguments}
+}
 \description{
 Modified version of dplyr's arrange that uses string arguments
 }

@@ -10,6 +10,8 @@ summarize.treedata(tdObject, ...)
 }
 \arguments{
 \item{tdObject}{A "\code{treedata}" object}
+
+\item{...}{additional arguments to summarize}
 }
 \value{
 A summary of the treedata object

@@ -3,7 +3,6 @@
 #' This function returns ancestral state estimates using a variety of methods
 #'
 #' @param td An object of class 'treedata'
-#' @param colID A column selector for the dataframe in td
 #' @param charType specifies the type of character, either:
 #' \describe{
 #' 		\item{"discrete"}{a character with a discrete number of states}
@@ -18,9 +17,12 @@
 #'		\item{"stochastic"}{create stochastic character map}
 #'	}	
 #' @param discreteModelType One of ER, SYM, or ARD; see geiger's fitDiscrete for full description
-#' @param plot If true, make a plot of ancestral states.
+#' @param na.rm How to deal with missing data.
+#' \describe{
+#'   	\item{"bytrait"}{Drop species out trait-by-trait}
+#' 		\item{"all"}{Drop out species that have NAs for any trait}	
+#'	}	
 #' @export
-
 aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER", na.rm="bytrait") {
 	
 	# check character type
@@ -323,7 +325,7 @@ getDiscreteAceStochastic<-function(phy, ndat, k, discreteModelType) {
 	zz		
 }
 	
-#' taken from phytools
+# taken from phytools
 addColorBar <- function (leg, cols, title = NULL, lims = c(0, 1), digits = 1, 
           prompt = TRUE, lwd = 4, outline = TRUE, ...) {
   if (prompt) {
@@ -367,7 +369,7 @@ addColorBar <- function (leg, cols, title = NULL, lims = c(0, 1), digits = 1,
             cex = fsize)
 }
 
-#' Fastanc function from phytools
+# Fastanc function from phytools
 fastAnc <- function (tree, x, vars = FALSE, CI = FALSE) {
   if (!is.binary.tree(tree)) 
     btree <- multi2di(tree)

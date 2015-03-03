@@ -12,6 +12,8 @@ reorder(tdObject, ...)
 \arguments{
 \item{tdObject}{An object of class 'treedata'}
 
+\item{...}{Additional arguments to reorder}
+
 \item{order}{Method for reordering}
 
 \item{index.only}{XXX}

@@ -26,9 +26,11 @@ aceArbor(td, charType = "continuous", aceType = "marginal",
 
 \item{discreteModelType}{One of ER, SYM, or ARD; see geiger's fitDiscrete for full description}
 
-\item{colID}{A column selector for the dataframe in td}
-
-\item{plot}{If true, make a plot of ancestral states.}
+\item{na.rm}{How to deal with missing data.
+\describe{
+      \item{"bytrait"}{Drop species out trait-by-trait}
+        \item{"all"}{Drop out species that have NAs for any trait}
+    }}
 }
 \description{
 This function returns ancestral state estimates using a variety of methods

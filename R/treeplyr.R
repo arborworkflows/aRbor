@@ -69,6 +69,7 @@ make.treedata <- function(tree, data, name_column="detect") {
 #' This function can be used to add new variables to a treedata object; see \code{\link{mutate}}.
 #' 
 #' @param tdObject A "\code{treedata}" object
+#' @param ... Arguments to mutate the treedata object
 #' @return An object of class "\code{treedata}" with new data added. 
 #' @examples
 #' data(anolis)
@@ -88,6 +89,7 @@ mutate.treedata <- function(tdObject, ...){
 #' This function can be used to select a subset of variables (columns) from a treedata object; see \code{\link{select}}.
 #' 
 #' @param tdObject A "\code{treedata}" object
+#' @param ... Additional arguments to select function
 #' @return An object of class "\code{treedata}" with specified variables selected. 
 #' @examples
 #' data(anolis)
@@ -109,6 +111,7 @@ select.treedata <- function(tdObject, ...){
 #' This function can be used to select a subset of species (rows) from a treedata object; see \code{\link{filter}}.
 #' 
 #' @param tdObject A "\code{treedata}" object
+#' @param ... Arguments used to filter the data.
 #' @return An object of class "\code{treedata}" with specified species selected. 
 #' @examples
 #' data(anolis)
@@ -133,6 +136,7 @@ filter.treedata <- function(tdObject, ...){
 #' This function can be used to summarize a treedata object. BUT IT DOES NOT WORK
 #' 
 #' @param tdObject A "\code{treedata}" object
+#' @param ... additional arguments to summarize
 #' @return A summary of the treedata object 
 #' @examples 
 #' data(anolis)
@@ -175,7 +179,7 @@ reorder <- function(tdObject, ...){
 #' @param tdObject An object of class 'treedata'
 #' @param order Method for reordering
 #' @param index.only XXX
-#' 
+#' @param ... Additional arguments to reorder
 #' @return An object of class 'treedata'
 #' 
 #' @examples
@@ -195,6 +199,8 @@ reorder.treedata <- function(tdObject, order="postorder", index.only=FALSE, ...)
 }
 
 #' @rdname treeply.treedata
+#' @param tdObject A treedata object
+#' @param ... Additional arguments
 #' @export
 treeply <- function(tdObject, ...){
   UseMethod("treeply")
@@ -276,6 +282,11 @@ treedply.treedata <- function(tdObject, ...){
 }
 
 #' A function for returning a named vector from a data frame or matrix with row names
+#'
+#' @param dat A data frame or matrix with row names
+#' @param ... The name of the column to select
+#' 
+#' @return A named vector
 #' @export
 getVector <- function(dat, ...){
   args <- as.character(substitute(list(...)))[-1L]
@@ -380,54 +391,70 @@ checkFactor <- function(tdObject, return.factor=TRUE) {
 # Examples are below
 
 #' Modified version of dplyr's filter that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_filter = function(.data, ...) {
   eval.string.dplyr(.data,"filter", ...)
 }
 
 #' Modified version of dplyr's select that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_select = function(.data, ...) {
   eval.string.dplyr(.data,"select", ...)
 }
 
 #' Modified version of dplyr's arrange that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_arrange = function(.data, ...) {
   eval.string.dplyr(.data,"arrange", ...)
 }
 
 #' Modified version of dplyr's arrange that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_mutate = function(.data, ...) {
   eval.string.dplyr(.data,"mutate", ...)
 }
 
 #' Modified version of dplyr's summarise that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_summarise = function(.data, ...) {
   eval.string.dplyr(.data,"summarise", ...)
 }
 
 #' Modified version of dplyr's group_by that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_group_by = function(.data, ...) {
   eval.string.dplyr(.data,"group_by", ...)
 }
 
 #' Modified version of dplyr's group_by that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_treeply = function(.data, ...) {
   eval.string.dplyr(.data,"treeply", ...)
 }
 
 #' Modified version of dplyr's group_by that uses string arguments
+#' @param .data dplyr object
+#' @param ... Additional arguments
 #' @export
 s_treedply = function(.data, ...) {
   eval.string.dplyr(.data,"treedply", ...)
 }
 
-#' Internal function used by s_filter, s_select etc.
+# Internal function used by s_filter, s_select etc.
 eval.string.dplyr = function(.data, .fun.name, ...) {
   args = list(...)
   args = unlist(args)

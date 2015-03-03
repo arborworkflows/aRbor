@@ -5,6 +5,11 @@
 \usage{
 s_summarise(.data, ...)
 }
+\arguments{
+\item{.data}{dplyr object}
+
+\item{...}{Additional arguments}
+}
 \description{
 Modified version of dplyr's summarise that uses string arguments
 }

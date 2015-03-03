@@ -5,6 +5,11 @@
 \usage{
 s_select(.data, ...)
 }
+\arguments{
+\item{.data}{dplyr object}
+
+\item{...}{Additional arguments}
+}
 \description{
 Modified version of dplyr's select that uses string arguments
 }

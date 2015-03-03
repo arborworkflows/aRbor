@@ -7,6 +7,8 @@ mutate.treedata(tdObject, ...)
 }
 \arguments{
 \item{tdObject}{A "\code{treedata}" object}
+
+\item{...}{Arguments to mutate the treedata object}
 }
 \value{
 An object of class "\code{treedata}" with new data added.

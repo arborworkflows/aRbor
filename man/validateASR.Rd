@@ -14,7 +14,19 @@ validateASR(asr, prior = "stationary", plot = TRUE, cex.node = 0.5,
 
 \item{plot}{A logical indicating whether a plot should be produced}
 
+\item{cex.node}{Scaling for node plots}
+
+\item{cex.tip}{Scaling for tips?}
+
+\item{cex.lab}{Scaling for tip labels}
+
+\item{cex.actual}{Scaling for something else. Josef?}
+
 \item{pal}{A color palette to color the nodes}
+
+\item{label.offset}{Offset for tip labels}
+
+\item{...}{Additional arguments to plot}
 }
 \description{
 Function that uses  "leave 1 out" validation of a discrete character model

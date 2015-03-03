@@ -7,6 +7,8 @@ filter.treedata(tdObject, ...)
 }
 \arguments{
 \item{tdObject}{A "\code{treedata}" object}
+
+\item{...}{Arguments used to filter the data.}
 }
 \value{
 An object of class "\code{treedata}" with specified species selected.

@@ -5,6 +5,11 @@
 \usage{
 s_filter(.data, ...)
 }
+\arguments{
+\item{.data}{dplyr object}
+
+\item{...}{Additional arguments}
+}
 \description{
 Modified version of dplyr's filter that uses string arguments
 }

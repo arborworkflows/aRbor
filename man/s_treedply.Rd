@@ -5,6 +5,11 @@
 \usage{
 s_treedply(.data, ...)
 }
+\arguments{
+\item{.data}{dplyr object}
+
+\item{...}{Additional arguments}
+}
 \description{
 Modified version of dplyr's group_by that uses string arguments
 }

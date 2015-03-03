@@ -3,7 +3,13 @@
 #' @param asr An asrArbor object produced by aceArbor
 #' @param prior Either "stationary" or "equal" 
 #' @param plot A logical indicating whether a plot should be produced
+#' @param cex.node Scaling for node plots
+#' @param cex.tip Scaling for tips?
+#' @param cex.actual Scaling for something else. Josef?
+#' @param cex.lab Scaling for tip labels 
 #' @param pal A color palette to color the nodes
+#' @param label.offset Offset for tip labels
+#' @param ... Additional arguments to plot
 #' @export
 
 validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.tip=0.5, cex.lab=1, cex.actual=5, pal=rainbow, label.offset=0.1,...){
@@ -27,7 +33,7 @@ validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.ti
     pis <- rep(1/k, k)
   }
   if(prior=="stationary"){
-    pis <- stationary.freqs(Q)
+    pis <- statdist.phytools(Q)
   }
   X <- t(X)
   rownames(X) <- names(states)
@@ -78,9 +84,11 @@ validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.ti
 #' @param prior Either "stationary" or "equal" 
 #' @param plot A logical indicating whether a plot should be produced
 #' @param cex.node Character expansion vector for the node pie charts
-#' @param cex.tips Character expansion vector for the tip pie charts
+#' @param cex.tip Character expansion vector for the tip pie charts
 #' @param cex.lab Character expansion vector for the tip labels
+#' @param label.offset How far to offset tip labels
 #' @param pal A color palette to color the nodes
+#' @param ... Additional arguments to plot.phylo
 predictMissingTips <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.tip=0.5, cex.lab=1, pal=rainbow, label.offset=0.1, ...){
   if(attributes(asr)$charType != "discrete") stop("Must be an asrArbor object with charType=='discrete'")
   fit <- attributes(asr[[1]])$fit
@@ -123,8 +131,8 @@ predictMissingTips <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5,
   invisible(res)
 }
 
-#' Internal function for calculating the marginal ancestral state of a node using the rerooting method. Adapted from
-#' phytools. 
+# Internal function for calculating the marginal ancestral state of a node using the rerooting method. 
+# Adapted from phytools. 
 reRootMethod <- function (i, tree, x, Q, model) {
   n <- length(tree$tip.label)
   yy <- x
@@ -135,8 +143,8 @@ reRootMethod <- function (i, tree, x, Q, model) {
   return(res.i)
 }
 
-#' Internal function for calculating the marginal ancestral state of a node using the rerooting method. Adapted from
-#' phytools. 
+# Internal function for calculating the marginal ancestral state of a node using the rerooting method. 
+# Adapted from phytools. 
 apeAce <- function (tree, x, model, fixedQ = NULL, ...) 
 {
   if (hasArg(output.liks)) 

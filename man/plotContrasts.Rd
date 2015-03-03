@@ -15,6 +15,8 @@ plotContrasts(tree, dat, cex.tip.label = 0.5, label.offset = 0.02,
 
 \item{label.offset}{The relative amount the tip labels are offset from the tips of the tree}
 
+\item{legend}{Show legend or not?}
+
 \item{...}{Additional arguments passed to plot.phylo}
 }
 \description{

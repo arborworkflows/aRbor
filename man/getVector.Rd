@@ -5,6 +5,14 @@
 \usage{
 getVector(dat, ...)
 }
+\arguments{
+\item{dat}{A data frame or matrix with row names}
+
+\item{...}{The name of the column to select}
+}
+\value{
+A named vector
+}
 \description{
 A function for returning a named vector from a data frame or matrix with row names
 }

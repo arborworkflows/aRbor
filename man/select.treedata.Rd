@@ -7,6 +7,8 @@ select.treedata(tdObject, ...)
 }
 \arguments{
 \item{tdObject}{A "\code{treedata}" object}
+
+\item{...}{Additional arguments to select function}
 }
 \value{
 An object of class "\code{treedata}" with specified variables selected.
