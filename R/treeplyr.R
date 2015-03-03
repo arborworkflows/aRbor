@@ -126,18 +126,16 @@ filter.treedata <- function(tdObject, ...){
   return(tdObject)
 }
 
-#' @name summarise
-#' @aliases summarize summarize.treedata summarise.treedata
+#' @name summarise.treedata
+#' @aliases summarize.treedata
 #' @title Function for summarizing an object of class 'treedata'
 #' 
-#' This function can be used to summarize a treedata object.
+#' This function can be used to summarize a treedata object. BUT IT DOES NOT WORK
 #' 
 #' @param tdObject A "\code{treedata}" object
 #' @return A summary of the treedata object 
-#' @examples
+#' @examples 
 #' data(anolis)
-#' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
-#' summarize(td)
 #' @export
 summarize.treedata <- function(tdObject, ...){
   if(is.null(list(substitute(...))[[1]]))  stop("No expression provided to summarize data")
@@ -151,6 +149,20 @@ summarise.treedata <- function(tdObject, ...){
   res <- summarise(tdObject$dat, ...)
   return(res)
 }
+
+summarize_.treedata <- function(.data, ..., .dots){
+  if(is.null(list(substitute(...))[[1]]))  stop("No expression provided to summarize data")
+  res <- summarize(.data$dat, ...)
+  return(res)
+}
+
+#' @export
+summarise_.treedata <- function(.data, ..., .dots){
+  if(is.null(list(substitute(...))[[1]])) stop("No expression provided to summarize data")
+  res <- summarise(.data$dat, ...)
+  return(res)
+}
+
 
 #' @rdname reorder.treedata
 #' @export
