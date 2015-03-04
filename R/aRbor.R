@@ -6,6 +6,8 @@
 #' @docType package
 #' @author Josef Uyeda and Luke Harmon
 #' @name aRbor
-#' @import ape geiger picante diversitree phytools dplyr RColorBrewer nlme
+#' @import ape geiger picante phytools dplyr RColorBrewer
 #' @importFrom lazyeval all_dots
+#' @importFrom diversitree make.mkn constrain argnames find.mle make.bisse starting.point.bisse asr.joint asr.marginal make.prior.exponential mcmc asr.stoch
+#' @importFrom nlme gls
 NULL
