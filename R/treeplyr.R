@@ -40,6 +40,7 @@ make.treedata <- function(tree, data, name_column="detect") {
   if(name_column==0){
     clnm <- colnames(dat)
     dat <- dat[,clnm, drop=FALSE]
+    dat.label <- as.character(rownames(data))
   } else {
     if(is.numeric(name_column)){
       clnm <- (1:ncol(data))[-name_column]
