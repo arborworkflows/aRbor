@@ -37,12 +37,7 @@ validateASR <- function(asr, prior="stationary", plot=TRUE, cex.node=0.5, cex.ti
   }
   X <- t(X)
   rownames(X) <- names(states)
-  if(prior=="equal"){
-    pis <- rep(1/k, k)
-  }
-  if(prior=="stationary"){
-    pis <- stationary.freqs(Q)
-  }
+
   probs <- sapply(1:ntips,function(x){X[x,] <- pis; reRootMethod(x, tree, X, Q)})
   #probs <- t(probs)
   #dd <- barplot(probs, col = cols, horiz=TRUE, xlim=c(-0.4, 1))

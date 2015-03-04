@@ -510,7 +510,7 @@ mutate_impl.dplyr <- function (df, dots)
 
 named_dots.dplyr <- function (...) 
 {
-    auto_name(dots.dplyr(...))
+    auto_name.dplyr(dots.dplyr(...))
 }
 
 dots.dplyr <- function (...) 
