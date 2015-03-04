@@ -60,7 +60,7 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
 	attributes(res)$aceType <- aceType
   if(charType=="discrete"){
     attributes(res)$discreteModelType = discreteModelType
-    attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[,x]))
+    attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[[x]]))
     attributes(res)$aceType <- aceType
 
   }

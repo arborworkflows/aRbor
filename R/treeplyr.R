@@ -21,13 +21,17 @@ make.treedata <- function(tree, data, name_column="detect") {
   }
   coln <- colnames(data)
   if(name_column=="detect"){
-    matches <- sapply(data.frame(rownames(data), data), function(x) sum(x %in% tree$tip.label))
+    if(is.null(rownames(data))){
+      tmp.df <- data.frame(data)
+      offset <- 0
+    } else {
+      tmp.df <- data.frame(rownames(data), data)
+      offset <- 1
+    }
+    matches <- sapply(tmp.df, function(x) sum(x %in% tree$tip.label))
     if(all(matches==0)) stop("No matching names found between data and tree")
-    name_column <- which(matches==max(matches))-1
+    name_column <- which(matches==max(matches))-offset
   }
-  if(name_column==0){
-    dat.label <- rownames(data)
-  } 
   dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(apply(data[,x, drop=FALSE], 1, as.character)))))
   #dat <- tbl_df(as.data.frame(lapply(1:ncol(data), function(x) type.convert(as.character(data[,x])))))
   #dat <- data
@@ -42,8 +46,8 @@ make.treedata <- function(tree, data, name_column="detect") {
     } else {
       clnm <- colnames(dat)[-which(colnames(dat)==name_column)]
     }
-    dat <- dat[, clnm, drop=FALSE]
-    dat.label <- as.character(data[[name_column]])
+    dat <- dat[, clnm, drop=FALSE]   
+    dat.label <- as.character(as.data.frame(data)[[name_column]])
   }
   data_not_tree <- setdiff(dat.label, tree$tip.label)
   tree_not_data <- setdiff(tree$tip.label, dat.label)
