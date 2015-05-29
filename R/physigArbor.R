@@ -56,7 +56,7 @@ physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discret
       		res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, signalTest, discreteModelType))
     	}
   	} else {
-	  res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, rownames(td$dat)), charType, signalTest, discreteModelType))
+	  res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, signalTest, discreteModelType))
   	}
   	
 	class(res) <- c("physigArbor", class(res))
