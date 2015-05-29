@@ -266,7 +266,7 @@ treedply <- function(tdObject, ...){
 #'  
 #' require(phytools)
 #' treedply(td, phylosig(phy, getVector(dat, awesomeness), "lambda", test=TRUE))
-#' treedply(td, phenogram(phy, getVector(dat, SVL), ftype="off"))
+#' treedply(td, phenogram(phy, getVector(dat, SVL), ftype="off", spreadlabels=FALSE))
 #' @export
 treedply.treedata <- function(tdObject, ...){
   if(!is.call(substitute(...))){
