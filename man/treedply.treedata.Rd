@@ -32,6 +32,6 @@ treedply(td, fitContinuous(phy, getVector(dat, SVL), model="BM", ncores=2))
 
 require(phytools)
 treedply(td, phylosig(phy, getVector(dat, awesomeness), "lambda", test=TRUE))
-treedply(td, phenogram(phy, getVector(dat, SVL), ftype="off", spreadlabels=FALSE))
+treedply(td, phenogram(phy, getVector(dat, SVL), ftype="off", spread.labels=FALSE))
 }
 
