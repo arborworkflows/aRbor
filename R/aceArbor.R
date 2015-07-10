@@ -164,6 +164,7 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	
 	zz<-t(asr.marginal(lik, coef(fit)))
   attributes(zz)$fit <- fit
+
 	zz		
 }
 
