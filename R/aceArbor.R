@@ -252,17 +252,18 @@ plotContAce <- function(td, trait, asr, pal=colorRampPalette(colors=c("darkblue"
   errorpolygon <- function(x, y, lo, est, hi, pal, indexfn, cex.asr=1, adj=c(0.75, 0.5)){
     n <- attributes(indexfn)$n
     lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
-    cex.x.scalar <- cex.asr/(100*diff(lastPP$x.lim))*adj[2]
+    cex.x.scalar <- cex.asr/(100)*diff(lastPP$x.lim)*adj[2]
     cex.yh.scalar <- (indexfn(hi)-indexfn(est))*adj[1]*diff(lastPP$y.lim)/n
     cex.yl.scalar <- (indexfn(est)-indexfn(lo))*adj[1]*diff(lastPP$y.lim)/n
     polygon(matrix(c(x, y+cex.yh.scalar, x-cex.x.scalar, y, x+cex.x.scalar, y), byrow=TRUE, ncol=2), border=NA, col=pal(n)[indexfn(hi)])
     polygon(matrix(c(x, y-cex.yl.scalar, x-cex.x.scalar, y, x+cex.x.scalar, y), byrow=TRUE, ncol=2), border=NA, col=pal(n)[indexfn(lo)])
     points(x, y, pch=21, cex=cex.asr, col=pal(n)[indexfn(est)], bg=pal(n)[indexfn(est)])
   }
-  get.index <- make.index(100, min(asr), max(asr))
+  n <- max(100, round((max(asr)-min(asr))*5, 0))
+  get.index <- make.index(n, min(asr), max(asr))
   gb <- lapply(1:length(XX), function(i) errorpolygon(XX[i], YY[i], asr[i,1], asr[i,2], asr[i,3], pal=pal, indexfn=get.index, cex.asr=cex.asr, adj=adjp))
-  addColorBar(0.4*(max(XX)-min(XX)), pal(100), title = trait, lims = c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
-  tiplabels(pch=21, bg=pal(100)[get.index(td$dat[[trait]])], col=pal(100)[get.index(td$dat[[trait]])] ,cex=2*cex.asr)
+  addColorBar(0.4*(max(XX)-min(XX)), pal(n), title = trait, lims = c(min(asr), max(asr)), digits=2, prompt=FALSE, x=0, y=1*par()$usr[3], lwd=10, fsize=1)
+  tiplabels(pch=21, bg=pal(n)[get.index(td$dat[[trait]])], col=pal(n)[get.index(td$dat[[trait]])] ,cex=2*cex.asr)
 }
 
 
