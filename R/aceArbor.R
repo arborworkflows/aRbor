@@ -44,7 +44,7 @@ aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelT
       res <- lapply(1:ncol(td$dat), function(i) {
         tdi <- select(td, i);
         tdi <- filter(tdi, !is.na(tdi$dat[,1]));
-        aceArborCalculator(tdi$phy, setNames(tdi$dat[,1], attributes(tdi)$tip.label), charType, aceType, discreteModelType)
+        aceArborCalculator(tdi$phy, setNames(tdi$dat[[1]], attributes(tdi)$tip.label), charType, aceType, discreteModelType)
       })
     }
     if(na.rm=="all"){
@@ -164,6 +164,7 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 	
 	zz<-t(asr.marginal(lik, coef(fit)))
   attributes(zz)$fit <- fit
+
 	zz		
 }
 
