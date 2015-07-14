@@ -13,18 +13,25 @@
 #' and the age of the node (The node-height test). Under BM the relationship should be 0. 
 #' @export
 
-plotContrasts <- function(tree, dat, cex.tip.label = 0.5, label.offset=0.02, legend=TRUE, ...){
+plotContrasts <- function(tree, dat, cex.tip.label = 0.5, label.offset=0.02, legend=TRUE, cex.scale=c(1,1), transparency.scale=c(255,255),
+                          palette=rainbow, quantiles=c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), colors.per.quantile=100, pts=TRUE, ...){
   tree$edge.length <- tree$edge.length/max(branching.times(tree))
   if(any(tree$edge.length==0)){
     tree$edge.length[tree$edge.length==0] <- min(tree$edge.length[tree$edge.length >0])/100
   }
   pic.dat <- pic(dat, tree)
-  pic.col <- .color.scale(abs(pic.dat),c(0,1,1),c(1,1,0),0)
+  #pic.col <- .color.scale(abs(pic.dat),c(0,1,1),c(1,1,0),0)
+  pic.col <- .cont2color(abs(pic.dat), pal=palette, qq=quantiles, n=colors.per.quantile)
+  transScale <- .scale(abs(pic.dat), range=transparency.scale, qq=quantiles, n= colors.per.quantile)
+  pic.col <- sapply(1:length(pic.col), function(x) makeTransparent(pic.col[x], transScale[x]))
+  edgeCol <- pic.col[tree$edge[,1]-length(tree$tip.label)]
+  sizeScale <- .scale(abs(pic.dat), range=cex.scale, qq=quantiles, n= colors.per.quantile)
+  edgeWidth <- sizeScale[tree$edge[,1]-length(tree$tip.label)]
   old.par <- par()
   par(mfrow=c(2,1))
-  par(mar=c(0,0,0,0))
-  plot(tree, cex=cex.tip.label, label.offset=label.offset*max(branching.times(tree)), ...)
-  nodelabels(pch=21, bg=pic.col)
+  par(mar=c(0,0,2,0))
+  plot(tree, cex=cex.tip.label, label.offset=label.offset*max(branching.times(tree)),edge.color=edgeCol,edge.width = edgeWidth, ...)
+  if(pts) nodelabels(pch=21, bg=pic.col, col=pic.col, cex=sizeScale)
   if (legend == TRUE) {
     pic.range <- seq(min(abs(pic.dat)), max(abs(pic.dat)), length.out=100)
     legend_image <- as.raster(matrix(rev(.color.scale(pic.range,c(0,1,1),c(1,1,0),0)), 
@@ -41,7 +48,7 @@ plotContrasts <- function(tree, dat, cex.tip.label = 0.5, label.offset=0.02, leg
   }
   
   par(mar=old.par$mar)
-  plot(branching.times(tree), abs(pic.dat), pch=21, xlim=c(1,0), bg=pic.col, xlab="Node Age", ylab="Absolute contrast")
+  plot(branching.times(tree), abs(pic.dat), pch=21, xlim=c(1,0), col=pic.col, bg=pic.col, cex=sizeScale, xlab="Node Age", ylab="Absolute contrast")
   nh.lm <- lm(abs(pic.dat)~branching.times(tree))
   abline(nh.lm, lty=2, lwd=2)
 }
@@ -133,6 +140,7 @@ plotContrasts <- function(tree, dat, cex.tip.label = 0.5, label.offset=0.02, leg
     colors[naxs] <- na.color
   return(colors)
 }
+
 ## Utility function for plotContrasts, taken from plotrix
 .color.rescale <- function (x, newrange) {
   if (missing(x) | missing(newrange)) {
@@ -157,4 +165,46 @@ plotContrasts <- function(tree, dat, cex.tip.label = 0.5, label.offset=0.02, leg
     warning("Only numeric objects can be rescaled")
     return(x)
   }
+}
+
+## My function for scaling continuous trait by color based on quantiles
+.cont2color <- function(x, pal=rainbow, qq=c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), n=100){
+    breaks <- quantile(x, qq)
+    breakPal <- pal(length(qq))
+    colors <- unlist(lapply(1:(length(breakPal)-1), function(x) colorRampPalette(c(breakPal[x], breakPal[x+1]))(n)))
+    ids <- unlist(lapply(1:(length(breakPal)-1), function(x) seq(qq[x], qq[x+1], length.out=n)))
+    dupid <- duplicated(ids) 
+    colors <- colors[-dupid]
+    ids <- ids[-dupid]
+    empquant <- ecdf(x)(x)
+    closest <- sapply(empquant, function(x) which(abs(ids-x)==min(abs(ids-x)))[1])
+    cols <- colors[closest]
+    return(cols)
+}
+
+.scale <- function(x, range=c(0, 1), qq=c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), n=100, log=TRUE){
+  breaks <- quantile(x, qq)
+  if(log){
+    seqlog <- exp(seq(log(range[1]+.Machine$double.eps), log(range[2]+.Machine$double.eps), length.out=(length(qq)-1)*n))
+    values <- seqlog
+    } else {
+    values <- unlist(lapply(1:(length(qq)-1), function(x) range[1]+seq(qq[x]*diff(range), qq[x+1]*diff(range), length.out=n)))
+    }
+  ids <- unlist(lapply(1:(length(qq)-1), function(x) seq(qq[x], qq[x+1], length.out=n)))
+  dupid <- duplicated(ids) 
+  values <- values[-dupid]
+  ids <- ids[-dupid]
+  empquant <- ecdf(x)(x)
+  closest <- sapply(empquant, function(x) which(abs(ids-x)==min(abs(ids-x)))[1])
+  vals <- values[closest]
+  return(vals)
+}
+
+makeTransparent <- function (someColor, alpha = 100) 
+{
+  newColor <- col2rgb(someColor)
+  apply(newColor, 2, function(curcoldata) {
+    rgb(red = curcoldata[1], green = curcoldata[2], blue = curcoldata[3], 
+        alpha = alpha, maxColorValue = 255)
+  })
 }
