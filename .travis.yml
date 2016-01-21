@@ -1,5 +1,7 @@
 language: r
 bioc_required: true
+sudo: false
+
 
 env:
   - global:
