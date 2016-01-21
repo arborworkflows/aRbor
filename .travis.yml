@@ -1,4 +1,5 @@
-language: c
+language: r
+bioc_required: true
 
 env:
   - global:
