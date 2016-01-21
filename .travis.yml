@@ -1,6 +1,6 @@
 language: r
 bioc_required: true
-sudo: false
+sudo: required
 
 
 env:
