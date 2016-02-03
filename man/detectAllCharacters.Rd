@@ -9,6 +9,8 @@ detectAllCharacters(mat, repeatsAsDiscrete = TRUE, cutoff = 0.1)
 \arguments{
 \item{mat}{A matrix of data}
 
+\item{repeatsAsDiscrete}{If TRUE, consider numeric variables that repeat values exactly as discrete; see cutoff}
+
 \item{cutoff}{Cutoff value for deciding if numeric data might actually be descrete: if nlev is the number of levels and n the length of dat, then nlev / n should exceed cutoff, or the data will be classified as discrete}
 }
 \value{
