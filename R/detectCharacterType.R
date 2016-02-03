@@ -49,7 +49,7 @@ detectAllCharacters<-function(mat, repeatsAsDiscrete=TRUE, cutoff=0.1) {
 #' @examples
 #' data(anolis)
 #' aType<-detectAllCharacters(anolis$dat)
-#' filterMatrix(anolis, aType, "discrete")
+#' filterMatrix(anolis$dat, aType, "discrete")
 #' @export
 
 filterMatrix<-function(mat, charType, returnType="discrete") {
