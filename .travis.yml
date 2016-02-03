@@ -26,5 +26,6 @@ after_failure:
 
 notifications:
   email:
+    - lukeh@uidaho.edu
     on_success: change
     on_failure: change
