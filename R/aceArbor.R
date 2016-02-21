@@ -172,7 +172,7 @@ getDiscreteAceMarginal<-function(phy, ndat, k, discreteModelType) {
 plotDiscreteReconstruction<-function(phy, zz, dat, charStates, pal=rainbow, cex=1, cex.asr=0.5, ...) {
 	plot(phy, cex=cex, ...)
 	nodelabels(pie=zz, piecol=pal(length(charStates)), cex=cex.asr, frame="circle")
-	tiplabels(pch=21, bg=pal(length(charStates))[as.numeric(factor(dat, levels=charStates))], cex=2*cex.asr) 
+	tiplabels(pch=21, bg=pal(length(charStates))[as.numeric(factor(dat[[1]], levels=charStates))], cex=2*cex.asr) 
 	legend("bottomleft", fill=pal(length(charStates)), legend=charStates)
 }
 
@@ -201,7 +201,9 @@ plot.asrArbor <- function(x, ...){
         if(attributes(x)$aceType=="stochastic") {
         	plot(x[[1]], td$phy)
         } else {
-        	plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), x[[i]], td$dat[!(attributes(td)$tip.label %in% na.drop[[i]]),i], charStates[[i]], main=colnames(td$dat)[i], ...)
+        	plotDiscreteReconstruction(drop.tip(td$phy, na.drop[[i]]), x[[i]], 
+        	                           td$dat[!(attributes(td)$tip.label %in% na.drop[[i]]),i], 
+        	                           charStates[[i]], main=colnames(td$dat)[i], ...)
         }
       }
       par(ask=FALSE)
