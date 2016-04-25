@@ -383,6 +383,9 @@ checkFactor <- function(tdObject, return.factor=TRUE) {
     }
   }
   if(return.factor){
+    for(i in 1:ncol(tdObject$dat)){
+      tdObject$dat[[i]] <- factor(tdObject$dat[[i]])
+    }
     return(tdObject)
   } else {
     invisible()
