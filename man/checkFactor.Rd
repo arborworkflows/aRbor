@@ -19,6 +19,7 @@ This function can be used to check if a treedata object contains factors and, if
 }
 \examples{
 data(anolis)
+require(treeplyr)
 td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
 tdforcefactor <- checkFactor(td)
 }

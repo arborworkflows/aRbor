@@ -37,6 +37,7 @@ checkNumeric <- function(tdObject, return.numeric=TRUE) {
 #' @return If return.factor, then an object of class "\code{treedata}" with all columns as factors.
 #' @examples
 #' data(anolis)
+#' require(treeplyr)
 #' td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
 #' tdforcefactor <- checkFactor(td)
 #' @export
