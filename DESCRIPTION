@@ -1,8 +1,8 @@
 Package: aRbor
 Type: Package
 Title: An R package with useful functions for Arbor workflows
-Version: 0.1
-Date: 2014-05-06
+Version: 0.2
+Date: 2018-05-30
 Author: Luke Harmon, Eliot Miller and Josef Uyeda
 Maintainer: Josef Uyeda <josef.uyeda@gmail.com>
 Description: This R package is an interface with Arbor Workflow software, www.arborworkflows.com.
@@ -18,3 +18,4 @@ Imports:
     RColorBrewer,
     lazyeval,
     phytools
+RoxygenNote: 6.0.1
