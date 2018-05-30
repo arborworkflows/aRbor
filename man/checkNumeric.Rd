@@ -19,6 +19,4 @@ This function can be used to check if a treedata object contains numeric columns
 }
 \examples{
 data(anolis)
-td <- make.treedata(anolis$phy, anolis$dat, name_column=1)
-tdnumeric <- checkNumeric(td)
 }
