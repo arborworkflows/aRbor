@@ -12,6 +12,9 @@ addons:
     packages:
       - libgsl0-dev
 
+r_github_packages:
+  - uyeda/treeplyr
+
 after_failure:
   "cat /home/travis/build/arborworkflows/aRbor/aRbor.Rcheck/00install.out"
 
