@@ -9,8 +9,6 @@ env:
 
 before_install:
 
-r_github_packages: richfitz/diversitree
-
 install:
 
 script: .

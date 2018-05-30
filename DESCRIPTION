@@ -9,8 +9,6 @@ Description: This R package is an interface with Arbor Workflow software, www.ar
 License: GPL-2 | GPL-3
 Depends:
     ape,
-    gsl,
-    diversitree,
     dplyr,
     geiger,
     nlme
