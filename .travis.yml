@@ -8,19 +8,13 @@ env:
     - WARNINGS_ARE_ERRORS=1
 
 before_install:
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
-install:
-  - ./travis-tool.sh aptget_install libgsl0-dev
-  - ./travis-tool.sh install_deps
-  - ./travis-tool.sh install_github richfitz/diversitree
-  - ./travis-tool.sh install_github mwpennell/geiger-v2
 
-script: ./travis-tool.sh run_tests
+install:
+
+script: .
 
 on_failure:
-  - ./travis-tool.sh dump_logs
+
 after_failure:
   "cat /home/travis/build/arborworkflows/aRbor/aRbor.Rcheck/00install.out"
 
