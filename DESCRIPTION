@@ -16,5 +16,6 @@ Imports:
     picante,
     RColorBrewer,
     lazyeval,
+    diversitree,
     phytools
 RoxygenNote: 6.0.1
