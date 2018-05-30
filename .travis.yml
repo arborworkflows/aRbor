@@ -8,6 +8,7 @@ env:
     - WARNINGS_ARE_ERRORS=1
 
 before_install:
+  r_github_packages: richfitz/diversitree
 
 install:
 
