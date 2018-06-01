@@ -17,8 +17,5 @@ Imports:
     RColorBrewer,
     lazyeval,
     diversitree,
-    phytools,
-    graphics,
-    abline,
-    legend
+    phytools
 RoxygenNote: 6.0.1
