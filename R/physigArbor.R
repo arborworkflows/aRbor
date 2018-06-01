@@ -1,19 +1,19 @@
 #' Function for measuring phylogenetic signal in comparative data
-#' 
+#'
 #' @param td A "\code{treedata}" object
 #' @param charType The type of data, one of:
 #' \describe{
 #'     \item{"continuous"}{Continuous}
-#'   	 \item{"discrete"}{Discrete (Categorical)}	
+#'   	 \item{"discrete"}{Discrete (Categorical)}
 #' 		 \item{"fromData"}{Try to tell from data: see \code{detectCharacterType}}
 #'	}
-#'  @param signalTest The test to carry out. Options are
+#' @param signalTest The test to carry out. Options are
 #'  \describe{
 #'     \item{"pagelLambda"}{Pagel's Lambda test}
 #'     \item{"Blomberg"}{Blomberg's K}
 #'     \item{"garbageTest"}{Garbage test (untested)}
 #'  }
-#'  @param discreteModelType Describes the discrete model. Options are
+#' @param discreteModelType Describes the discrete model. Options are
 #'  \describe{
 #'     \item{"ER"}{Equal rates}
 #'     \item{"SYM"}{Symmetric}
@@ -22,16 +22,16 @@
 #' @param na.rm How to deal with missing data.
 #' \describe{
 #'     \item{"bytrait"}{Drop species out trait-by-trait}
-#' 		\item{"all"}{Drop out species that have NAs for any trait}	
-#'	}	
-#' @return An object of class physigArbor. 
+#' 		\item{"all"}{Drop out species that have NAs for any trait}
+#'	}
+#' @return An object of class physigArbor.
 #' @export
 physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discreteModelType="ER", na.rm="bytrait") {
 	charType = match.arg(charType, c("fromData", "discrete", "continuous"))
 
 	if(charType =="fromData") # then try to figure it out
 		charType <-detectCharacterType(td$dat[[1]])
-	
+
 	# check that the data actually make sense - this is a pretty weak test
 	if(charType=="continuous") {
     	td <- checkNumeric(td, return.numeric=TRUE)
@@ -39,7 +39,7 @@ physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discret
 	if(charType=="discrete") {
 		td <- checkFactor(td, return.factor=TRUE)
 	}
-	
+
 	signalTest = match.arg(signalTest, c("pagelLambda", "Blomberg", "garbageTest"))
 	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
 
@@ -58,7 +58,7 @@ physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discret
   	} else {
 	  res <- lapply(td$dat, function(x) physigArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, signalTest, discreteModelType))
   	}
-  	
+
 	class(res) <- c("physigArbor", class(res))
   	attributes(res)$td <- td
 	attributes(res)$charType <- charType
@@ -76,16 +76,16 @@ physigArbor<-function(td, charType="fromData", signalTest="pagelLambda", discret
 }
 
 physigArborCalculator<-function(phy, dat, charType="fromData", signalTest="pagelLambda", discreteModelType="ER") {
-	
+
 	if(charType =="discrete") {
 		# this changes the discrete data to 1:n and remembers the original charStates
 		dat<-as.factor(dat)
 		charStates<-levels(dat)
 		k<-nlevels(dat)
-		
+
 		ndat<-as.numeric(dat)
 		names(ndat)<-names(dat)
-		
+
 		if(signalTest=="pagelLambda") {
 			res<-discreteLambdaTest(phy, ndat, k, discreteModelType)
 		} else if(signalTest=="garbageTest") {
@@ -94,7 +94,7 @@ physigArborCalculator<-function(phy, dat, charType="fromData", signalTest="pagel
 			stop("Blomberg K should not be used for discrete characters")
 		}
 	}
-	
+
 	if(charType =="continuous") {
 		if(signalTest=="pagelLambda") {
 			res<-continuousLambdaTest(phy, dat)
@@ -104,7 +104,7 @@ physigArborCalculator<-function(phy, dat, charType="fromData", signalTest="pagel
 			res<-continuousBlombergTest(phy, dat)
 		}
 	}
-	
+
 	return(res)
 
 }
@@ -113,19 +113,19 @@ discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
 	l0tree<-rescale(phy, "lambda", 0)
 	m1<-fitDiscrete(l0tree, ndat, model=discreteModelType)
 	m2<-fitDiscrete(phy, ndat, model=discreteModelType, transform="lambda")
-	
+
 	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
-	
+
 	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
 	names(lnlValues)<-c("Lambda fixed at zero", "Lambda estimated")
-	
+
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
 	names(aiccScores)<-c("Lambda fixed at zero", "Lambda estimated")
-	
+
 	lambdaValue<-m2$opt$lambda
 
-	
+
 	res<-list(lnlValues= lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores, lambdaValue= lambdaValue)
 	return(res)
 }
@@ -133,14 +133,14 @@ discreteLambdaTest<-function(phy, ndat, k, discreteModelType) {
 discreteGarbageTest<-function(phy, ndat, k, discreteModelType) {
 	m1<-fitDiscrete(phy, ndat, model=discreteModelType)
 	m2<-fitDiscreteGarbageModel(phy, ndat)
-	
+
 	lnlValues<-c(m1$opt$lnL, m2$lnL)
 	names(lnlValues)<-c("Mk", "Garbage")
-	
-	
+
+
 	aiccScores<-c(m1$opt$aicc, m2$aicc)
 	names(aiccScores)<-c("Mk", "Garbage")
-	
+
 	res<-list(lnlValues= lnlValues, chisqTestStat= NULL, chisqPVal= NULL, aiccScores= aiccScores)
 	return(res)
 }
@@ -159,24 +159,24 @@ fitDiscreteGarbageModel<-function(phy, ndat) {
 
 
 continuousLambdaTest<-function(phy, dat) {
-	
+
 	l0tree<-rescale(phy, "lambda", 0)
 
 	m1<-fitContinuous(l0tree, dat, model="BM")
 	m2<-fitContinuous(phy, dat, model="lambda")
-	
+
 	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
 	names(lnlValues)<-c("Lambda fixed at zero", "Lambda estimated")
-	
+
 	lambdaValue<-m2$opt$lambda
-	
+
 	chisqTestStat <- 2 * (m2$opt$lnL-m1$opt$lnL)
 	chisqPVal <- pchisq(chisqTestStat, 1, lower.tail=F)
-	
+
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
 	names(aiccScores)<-c("Lambda fixed at zero", "Lambda estimated")
-	
-	
+
+
 	res<-list(lnlValues = lnlValues, chisqTestStat= chisqTestStat, chisqPVal= chisqPVal, aiccScores= aiccScores, lambdaValue= lambdaValue)
 	return(res)
 }
@@ -185,15 +185,15 @@ continuousLambdaTest<-function(phy, dat) {
 continuousGarbageTest<-function(phy, dat) {
 	m1<-fitContinuous(phy, dat)
 	m2<-fitContinuous(phy, dat, model="white")
-	
+
 	lnlValues<-c(m1$opt$lnL, m2$opt$lnL)
 	names(lnlValues)<-c("BM", "white-noise")
-	
-	
-	
+
+
+
 	aiccScores<-c(m1$opt$aicc, m2$opt$aicc)
 	names(aiccScores)<-c("Mk", "WhiteNoise")
-	
+
 	res<-list(lnlValues= lnlValues, chisqTestStat= NULL, chisqPVal= NULL, aiccScores= aiccScores)
 	return(res)
 }

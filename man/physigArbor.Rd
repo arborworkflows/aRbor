@@ -13,26 +13,28 @@ physigArbor(td, charType = "fromData", signalTest = "pagelLambda",
 \item{charType}{The type of data, one of:
 \describe{
     \item{"continuous"}{Continuous}
-       \item{"discrete"}{Discrete (Categorical)}    
+       \item{"discrete"}{Discrete (Categorical)}
          \item{"fromData"}{Try to tell from data: see \code{detectCharacterType}}
-}
- @param signalTest The test to carry out. Options are
- \describe{
-    \item{"pagelLambda"}{Pagel's Lambda test}
-    \item{"Blomberg"}{Blomberg's K}
-    \item{"garbageTest"}{Garbage test (untested)}
- }
- @param discreteModelType Describes the discrete model. Options are
- \describe{
-    \item{"ER"}{Equal rates}
-    \item{"SYM"}{Symmetric}
-    \item{"ARD"}{All rates different}
- }}
+}}
+
+\item{signalTest}{The test to carry out. Options are
+\describe{
+   \item{"pagelLambda"}{Pagel's Lambda test}
+   \item{"Blomberg"}{Blomberg's K}
+   \item{"garbageTest"}{Garbage test (untested)}
+}}
+
+\item{discreteModelType}{Describes the discrete model. Options are
+\describe{
+   \item{"ER"}{Equal rates}
+   \item{"SYM"}{Symmetric}
+   \item{"ARD"}{All rates different}
+}}
 
 \item{na.rm}{How to deal with missing data.
 \describe{
     \item{"bytrait"}{Drop species out trait-by-trait}
-        \item{"all"}{Drop out species that have NAs for any trait}    
+        \item{"all"}{Drop out species that have NAs for any trait}
 }}
 }
 \value{
