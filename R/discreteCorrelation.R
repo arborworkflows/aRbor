@@ -52,7 +52,9 @@ discreteCorrelation<-function(tree, table, column1, column2, modelType="ER") {
 
   lrPVal <- pchisq(lrStat, lrDF, lower.tail=F)
 
-  return(list(unames=unames, cnames=cnames, lrStat= lrStat, lrDF= lrDF, lrPVal= lrPVal))
+  res<-c(lrStat,lrDF,lrPVal, uML$par, cML$par)
+  names(res)<-c("lrStat","lrDF","lrPVal", unames, cnames)
+  return(res)
 
 }
 
