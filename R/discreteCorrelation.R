@@ -37,7 +37,7 @@ discreteCorrelation<-function(tree, table, column1, column2, modelType="ER") {
 
   constraint<-makeDiscreteCorrelationConstraints(modelType=modelType)
 
-  lik<-make.mkn(phy, ndat, k=k)
+  lik<-make.mkn(tree, ndat, k=k)
   ulik<-constrain(lik, formulae=constraint$uCon, extra=constraint$uExtra)
   clik<-constrain(lik, formulae=constraint$cCon, extra=constraint$cExtra)
 
