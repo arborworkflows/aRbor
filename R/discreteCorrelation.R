@@ -48,7 +48,7 @@ discreteCorrelation<-function(tree, table, column1, column2, modelType="ER") {
   cML<-find.mle(clik, setNames(rep(1,length(cnames)), argnames(clik)))
 
   lrStat<-2*(cML$lnLik - uML$lnLik)
-  lrDF <- 2*(length(cnames)-length(unames))
+  lrDF <- length(cnames)-length(unames)
 
   lrPVal <- pchisq(lrStat, lrDF, lower.tail=F)
 
