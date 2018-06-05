@@ -10,8 +10,10 @@ bisseArbor<-function(td) {
 	# check character type
 	td <- checkFactor(td, return.factor=TRUE)
 	
-	res <- lapply(td$dat, function(x) bisseArborCalculator(td$phy, setNames(x, rownames(td$dat))))
-	
+	for(i in 1:ncol(td$dat)) {
+	  res[[i]] <- bisseArborCalculator(td$phy, td[[i]])
+	}
+
 	class(res) <- c("asrArbor", class(res))
   	attributes(res)$td <- td
   	attributes(res)$charType <- "discrete"
