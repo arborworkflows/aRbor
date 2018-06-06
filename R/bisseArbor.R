@@ -10,17 +10,24 @@ bisseArbor<-function(td) {
 	# check character type
 	td <- checkFactor(td, return.factor=TRUE)
 	
+	res<-list()
 	for(i in 1:ncol(td$dat)) {
 	  res[[i]] <- bisseArborCalculator(td$phy, td[[i]])
 	}
+	
+	myRes<-list();
+	myRes$bisLik<-res[[i]]$fullm$lnLik
+	myRes$bisk<-length(res[[i]]$fullm$par)
+	myRes$nullLik<-res[[i]]$nullm$lnLik
+	myRes$nullk<-length(res[[i]]$nullm$par)
+	
+	myRes$lrStat <- 2*(myRes$bisLik-myRes$nullLik)
+	myRes$lrDF <- myRes$bisk- 	myRes$nullk
+	myRes$lrPVal <- pchisq(myRes$lrStat, myRes$lrDF, lower.tail=F)
 
-	class(res) <- c("asrArbor", class(res))
-  	attributes(res)$td <- td
-  	attributes(res)$charType <- "discrete"
-	attributes(res)$bisseType <- "Mk2"
-    attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[,x]))
- 
-	return(res)
+	paramTable<-c(res[[i]]$nullm$par, res[[i]]$fullm$par)
+	names(paramTable)<-c(paste("null_", names(res[[i]]$nullm$par),sep=""),  paste("bis_", names(res[[i]]$fullm$par),sep=""))
+	return(list(stats=myRes, param=paramTable))
 	
 }	
 
@@ -39,8 +46,10 @@ bisseArborCalculator<-function(phy, dat, names=NULL) {
 		
 	if(!is.null(names)) names(ndat)<-names
 	
-	zz<-getBisseMk2(phy, ndat)
+	fm<-getBisseMk2(phy, ndat)
+	nm<-getBisseMk2Null(phy, ndat)
 	
+	zz<-list(fullm=fm, nullm=nm)
 	return(zz)	
 	
 	
@@ -50,21 +59,24 @@ getBisseMk2<-function(phy, ndat) {
 	
 	lik<-make.bisse(phy, ndat-1)
 	
-	#model type not supported yet
-	#con<-makeMkConstraints(k=k, modelType= discreteModelType)
-	#ltemp<-lik
-	
-	#if(!is.null(con))
-	#	for(i in 1:length(con)) ltemp<-constrain(ltemp, con[[i]], extra=extra)
-	
-	#lik<-ltemp
-	
 	p<-starting.point.bisse(phy)
 	fit<-find.mle(lik, p)
 	
 	return(fit)	
 }
 
+getBisseMk2Null<-function(phy, ndat) {
+  
+  lik<-make.bisse(phy, ndat-1)
+  
+  lik<-constrain(lik, lambda0~lambda1, mu0~mu1)
+  
+  p<-starting.point.bisse(phy)[argnames(lik)]
+  
+  fit<-find.mle(lik, p)
+  
+  return(fit)	
+}
 
 
 			
