@@ -27,7 +27,7 @@ bisseArbor<-function(td) {
 
 	paramTable<-c(res[[i]]$nullm$par, res[[i]]$fullm$par)
 	names(paramTable)<-c(paste("null_", names(res[[i]]$nullm$par),sep=""),  paste("bis_", names(res[[i]]$fullm$par),sep=""))
-	return(list(stats=myRes, param=paramTable))
+	return(list(stats=myRes, param=as.list(paramTable)))
 	
 }	
 
