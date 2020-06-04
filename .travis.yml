@@ -11,6 +11,7 @@ addons:
   apt:
     packages:
       - libgsl0-dev
+      - libmagick++-dev
 
 r_github_packages:
   - uyedaj/treeplyr
