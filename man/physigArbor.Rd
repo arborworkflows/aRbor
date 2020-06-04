@@ -4,8 +4,13 @@
 \alias{physigArbor}
 \title{Function for measuring phylogenetic signal in comparative data}
 \usage{
-physigArbor(td, charType = "fromData", signalTest = "pagelLambda",
-  discreteModelType = "ER", na.rm = "bytrait")
+physigArbor(
+  td,
+  charType = "fromData",
+  signalTest = "pagelLambda",
+  discreteModelType = "ER",
+  na.rm = "bytrait"
+)
 }
 \arguments{
 \item{td}{A "\code{treedata}" object}

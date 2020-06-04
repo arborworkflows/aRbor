@@ -23,7 +23,7 @@
 #' 		\item{"all"}{Drop out species that have NAs for any trait}	
 #'	}	
 #' @export
-aceArbor<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER", na.rm="bytrait") {
+ace.treedata<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER", na.rm="bytrait") {
 	
 	# check character type
 	ctype = match.arg(charType, c("discrete", "continuous"))

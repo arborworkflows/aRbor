@@ -4,10 +4,20 @@
 \alias{plotContrasts}
 \title{Function for plotting contrast values}
 \usage{
-plotContrasts(tree, dat, cex.tip.label = 0.5, label.offset = 0.02,
-  legend = TRUE, cex.scale = c(1, 1), transparency.scale = c(255, 255),
-  palette = rainbow, quantiles = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1),
-  colors.per.quantile = 100, pts = TRUE, ...)
+plotContrasts(
+  tree,
+  dat,
+  cex.tip.label = 0.5,
+  label.offset = 0.02,
+  legend = TRUE,
+  cex.scale = c(1, 1),
+  transparency.scale = c(255, 255),
+  palette = rainbow,
+  quantiles = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1),
+  colors.per.quantile = 100,
+  pts = TRUE,
+  ...
+)
 }
 \arguments{
 \item{tree}{A tree of class 'phylo'}

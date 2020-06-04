@@ -3,7 +3,6 @@
 \docType{package}
 \name{aRbor}
 \alias{aRbor}
-\alias{aRbor-package}
 \title{aRbor: a package to interact with Arbor Workflows}
 \description{
 The aRbor package is a set of functions that can be integrated as workflow modules in the 

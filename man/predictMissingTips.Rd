@@ -4,8 +4,17 @@
 \alias{predictMissingTips}
 \title{A function to predict the states of missing tips}
 \usage{
-predictMissingTips(asr, prior = "stationary", plot = TRUE, cex.node = 0.5,
-  cex.tip = 0.5, cex.lab = 1, pal = rainbow, label.offset = 0.1, ...)
+predictMissingTips(
+  asr,
+  prior = "stationary",
+  plot = TRUE,
+  cex.node = 0.5,
+  cex.tip = 0.5,
+  cex.lab = 1,
+  pal = rainbow,
+  label.offset = 0.1,
+  ...
+)
 }
 \arguments{
 \item{asr}{An asrArbor object produced by aceArbor}

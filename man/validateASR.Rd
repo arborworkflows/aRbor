@@ -4,9 +4,18 @@
 \alias{validateASR}
 \title{Function that uses  "leave 1 out" validation of a discrete character model}
 \usage{
-validateASR(asr, prior = "stationary", plot = TRUE, cex.node = 0.5,
-  cex.tip = 0.5, cex.lab = 1, cex.actual = 5, pal = rainbow,
-  label.offset = 0.1, ...)
+validateASR(
+  asr,
+  prior = "stationary",
+  plot = TRUE,
+  cex.node = 0.5,
+  cex.tip = 0.5,
+  cex.lab = 1,
+  cex.actual = 5,
+  pal = rainbow,
+  label.offset = 0.1,
+  ...
+)
 }
 \arguments{
 \item{asr}{An asrArbor object produced by aceArbor}

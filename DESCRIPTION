@@ -10,6 +10,7 @@ License: GPL-2 | GPL-3
 Depends:
     ape,
     dplyr,
+    treeplyr,
     geiger,
     nlme
 Imports:
@@ -18,4 +19,4 @@ Imports:
     lazyeval,
     diversitree,
     phytools
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.0

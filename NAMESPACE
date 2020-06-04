@@ -3,7 +3,7 @@
 S3method(plot,asrArbor)
 S3method(print,asrArbor)
 S3method(print,physigArbor)
-export(aceArbor)
+export(ace.treedata)
 export(bisseArbor)
 export(checkFactor)
 export(checkNumeric)
