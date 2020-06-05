@@ -7,7 +7,7 @@
 #' \describe{
 #' 		\item{"discrete"}{a character with a discrete number of states}
 #' 		\item{"continuous"}{a continuously varying character}	
-#' 		\item{"fromData"}{will attempt to determine the data type from the data itself; DO NOT USE YET!}
+#' 		\item{"detect"}{will attempt to determine the data type from the data itself}
 #'	}
 #' @param aceType specifies the method used to reconstruct ancestral character states:
 #' \describe{
@@ -23,46 +23,48 @@
 #' 		\item{"all"}{Drop out species that have NAs for any trait}	
 #'	}	
 #' @export
-ace.treedata<-function(td, charType="continuous", aceType="marginal", discreteModelType="ER", na.rm="bytrait") {
+ace.treedata<-function(td, charType="detect", aceType="marginal", discreteModelType="ER", na.rm="bytrait") {
 	
 	# check character type
-	ctype = match.arg(charType, c("discrete", "continuous"))
+	ctype = match.arg(charType, c("discrete", "continuous", "detect"))
+  if(ctype=="detect") {
+    charTypes<-detectAllCharacters(td)
+  }
+	if(ctype=="discrete") {
+	  td<-forceFactor(td)
+	  charTypes<-rep("discrete", dim(td$dat)[2])
+	}
+	if(ctype=="continuous") {
+	  td<-forceNumeric(td)
+	  charTypes<-rep("continuous", dim(td$dat)[2])
+	}
 	discreteModelType = match.arg(discreteModelType, c("ER", "SYM", "ARD"))
 	aceType = match.arg(aceType, c("marginal", "joint", "MCMC", "stochastic"))
 	
-	
-	# check that the data actually make sense - this is a pretty weak test
-	if(charType=="continuous") {
-    td <- checkNumeric(td, return.numeric=TRUE)
+	if(na.rm=="bytrait"){
+	  res <- lapply(1:ncol(td$dat), function(i) {
+	    tdi <- select(td, i);
+	    tdi <- filter(tdi, !is.na(tdi$dat[,1]));
+	    aceArborCalculator(tdi$phy, setNames(tdi$dat[[1]], attributes(tdi)$tip.label), charTypes[i], aceType, discreteModelType)
+	  }) 
+	} else { # na.rm is "all"
+	   td <- filter(td, apply(apply(td$dat, 1, function(x) !is.na(x)), 2, all))
+	   res <- lapply(1:ncol(td$dat), function(i) {
+	     aceArborCalculator(td$phy, setNames(tdi$dat[[1]], attributes(td)$tip.label), charTypes[i], aceType, discreteModelType)
+	   })
 	}
-	if(charType=="discrete") {
-	  td <- checkFactor(td, return.factor=TRUE)
-	}
 	
-  if(any(is.na(td$dat))){
-    if(na.rm=="bytrait"){
-      res <- lapply(1:ncol(td$dat), function(i) {
-        tdi <- select(td, i);
-        tdi <- filter(tdi, !is.na(tdi$dat[,1]));
-        aceArborCalculator(tdi$phy, setNames(tdi$dat[[1]], attributes(tdi)$tip.label), charType, aceType, discreteModelType)
-      })
-    }
-    if(na.rm=="all"){
-      td <- filter(td, apply(apply(td$dat, 1, function(x) !is.na(x)), 2, all))
-      res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, aceType, discreteModelType))
-    }
-  } else {
-	  res <- lapply(td$dat, function(x) aceArborCalculator(td$phy, setNames(x, attributes(td)$tip.label), charType, aceType, discreteModelType))
-  }
   class(res) <- c("asrArbor", class(res))
   attributes(res)$td <- td
 	attributes(res)$charType <- charType
+	if(charType=="detect") {
+	  attributes(res)$detectedCharTypes<-charTypes
+	}
 	attributes(res)$aceType <- aceType
-  if(charType=="discrete"){
-    attributes(res)$discreteModelType = discreteModelType
+	attributes(res)$discreteModelType = discreteModelType
+	attributes(res)$aceType <- aceType
+  if("discrete" %in% charTypes){
     attributes(res)$charStates = lapply(1:ncol(td$dat), function(x) levels(td$dat[[x]]))
-    attributes(res)$aceType <- aceType
-
   }
   if(any(is.na(td$dat))){
     attributes(res)$na.drop <- lapply(td$dat, function(x) attributes(td)$tip.label[which(is.na(x))])
