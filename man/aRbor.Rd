@@ -5,7 +5,7 @@
 \alias{aRbor}
 \title{aRbor: a package to interact with Arbor Workflows}
 \description{
-The aRbor package is a set of functions that can be integrated as workflow modules in the 
+The aRbor package is a set of functions that can be integrated as workflow modules in the
 Arbotr webapp. aRbor also includes the specifications of the "treedata" object.
 }
 \author{
