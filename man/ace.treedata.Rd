@@ -6,7 +6,7 @@
 \usage{
 ace.treedata(
   td,
-  charType = "continuous",
+  charType = "detect",
   aceType = "marginal",
   discreteModelType = "ER",
   na.rm = "bytrait"
@@ -19,7 +19,7 @@ ace.treedata(
 \describe{
         \item{"discrete"}{a character with a discrete number of states}
         \item{"continuous"}{a continuously varying character}    
-        \item{"fromData"}{will attempt to determine the data type from the data itself; DO NOT USE YET!}
+        \item{"detect"}{will attempt to determine the data type from the data itself}
 }}
 
 \item{aceType}{specifies the method used to reconstruct ancestral character states:
